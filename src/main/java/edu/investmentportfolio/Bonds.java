@@ -1,4 +1,4 @@
-package main;
+package main.java.edu.investmentportfolio;
 //Bond/fixed income (price, coupon, yield, expdate)
 
 public class Bonds {
