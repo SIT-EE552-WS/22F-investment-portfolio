@@ -1,4 +1,4 @@
-package main.java.edu.investmentportfolio;
+package edu.investmentportfolio;
 
 import java.io.Serializable;
 

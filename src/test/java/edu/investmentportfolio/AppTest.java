@@ -1,4 +1,4 @@
-package test.java.edu.investmentportfolio;
+package edu.investmentportfolio;
 
 /**
  * Unit test for simple App.
