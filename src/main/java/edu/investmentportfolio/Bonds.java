@@ -3,23 +3,25 @@ package edu.investmentportfolio;
 
 public class Bonds {
     private double price;
-    private double coupon;
     private double yield;
     private double expdate;
 
     public Bonds(double price, double coupon, double yield, double expdate) {
         this.price = price;
-        this.coupon = coupon;
         this.yield = yield;
         this.expdate = expdate;
     }
 
-    public double getPrice() {
-        return this.price;
+    public static void buy(double bond) {
+        // buying the bond
     }
 
-    public double getCoupon() {
-        return this.coupon;
+    public static void cashIn(double bond) {
+        // cashing in the bond, should increase the over cash of the user
+    }
+
+    public double getPrice() {
+        return this.price;
     }
 
     public double getYield() {
