@@ -2,6 +2,7 @@ package edu.investmentportfolio;
 //Bond/fixed income (price, coupon, yield, expdate)
 
 public class Bonds {
+    private static final long serialVersionUID = 4L;
     private double price;
     private double yield;
     private double expdate;
