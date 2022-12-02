@@ -11,6 +11,9 @@ public class Account<E> implements Serializable {
     private String firstName;
     private String lastName;
 
+    public Account() {
+    }
+
     public Account(String firstName, String lastName, double cash) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -33,6 +36,7 @@ public class Account<E> implements Serializable {
     public void addStock(String name, double quantity) throws Exception {
         Stock temp = new Stock();
         double price = temp.buyStock(name, quantity);
+        System.out.println(name + " bought at " + price);
         if (price != 0) {
             if (this.cash.getBalance() < price) {
                 System.out.println("You do not have enough money to buy that stock.");

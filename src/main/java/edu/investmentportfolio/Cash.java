@@ -17,6 +17,7 @@ public class Cash implements Serializable {
             System.out.println("You do not have enough money to withdraw that amount.");
             return 0;
         } else {
+            setMoney();
             this.balance -= cashAmount;
             return cashAmount;
         }
@@ -24,15 +25,18 @@ public class Cash implements Serializable {
 
     public double deposit(double cashAmount) {
         this.balance = this.balance + cashAmount;
+        setMoney();
         return this.balance;
     }
 
     public double getBalance() {
+        setMoney();
         return this.balance;
     }
 
     public void addInterest() {
         this.balance = this.balance * this.interest + this.balance;
+        setMoney();
     }
 
     @Override
@@ -40,4 +44,7 @@ public class Cash implements Serializable {
         return "Cash Balance: " + balance + ", Interest Rate: " + interest + "\n";
     }
 
+    public void setMoney() {
+        this.balance = Math.round(this.balance * 100.0) / 100.0;
+    }
 }

@@ -52,7 +52,7 @@ public class Stock implements Serializable {
         double price = jsonObject.get("c").getAsDouble();
 
         if (price != 0) {
-            return this.price * this.quantity;
+            return price * quantity;
         } else {
             System.out.println("Invalid stock name.");
             return 0;
