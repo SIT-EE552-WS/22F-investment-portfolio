@@ -20,7 +20,7 @@ public class Bonds {
     final double year7US = 3.588;
     final double year10US = 3.486;
     final double year20US = 3.764;
-    final double year30US = 3.541;
+    final double year30US = 3.54;
     public Bonds(double price, double coupon, double yield, double expdate) {
         this.price = price;
         this.yield = yield;
