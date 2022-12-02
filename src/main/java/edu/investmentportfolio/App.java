@@ -14,7 +14,11 @@ public class App {
         user.viewBalance();
         user.addStock("AAPL", 3.0);
         user.viewStocks();
+        user.addStock("AAPL", 3);
+        user.sellStock("AAPL", 5);
         user.viewPortfolio();
-
+        user.addStock("MSFT", 1);
+        user.viewPortfolio();
+        user.addStock("MSFT", 10);
     }
 }

@@ -1,5 +1,6 @@
 package edu.investmentportfolio;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,12 +37,13 @@ public class Account<E> implements Serializable {
     public void addStock(String name, double quantity) throws Exception {
         Stock temp = new Stock();
         double price = temp.buyStock(name, quantity);
-        System.out.println(name + " bought at " + price);
+        double amount = price * quantity;
         if (price != 0) {
-            if (this.cash.getBalance() < price) {
+            if (this.cash.getBalance() < amount) {
                 System.out.println("You do not have enough money to buy that stock.");
             } else {
-                this.cash.withdraw(price);
+                System.out.println(name + " bought at " + price);
+                this.cash.withdraw(amount);
                 if (portfolio.containsKey(name)) {
                     Stock stock = (Stock) portfolio.get(name);
                     stock.addQuantity(quantity);
@@ -62,13 +64,13 @@ public class Account<E> implements Serializable {
         }
     }
 
-    public void sellStock(String name, double quantity) {
+    public void sellStock(String name, double quantity) throws IOException, InterruptedException {
         if (portfolio.containsKey(name)) {
             Stock stock = (Stock) portfolio.get(name);
             if (stock.getQuantity() < quantity) {
                 System.out.println("You do not have enough stock to sell that amount.");
             } else {
-                double price = stock.sellStock(quantity);
+                double price = stock.sellStock(name, quantity);
                 this.cash.deposit(price);
                 if (stock.getQuantity() == 0) {
                     portfolio.remove(name);
@@ -80,13 +82,18 @@ public class Account<E> implements Serializable {
     }
 
     public void viewPortfolio() {
-        System.out.println("Account Holder: " + this.firstName + " " + this.lastName);
-        System.out.println("Cash Balance: " + this.cash.getBalance());
+        System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
+        System.out.println("Account Holder: " + this.firstName + " " + this.lastName + "\n");
+        System.out.println("Cash Balance: " + this.cash.getBalance() + "\n");
+
+        System.out.println("________________________________________________________");
+        System.out.println("Current Stock Holdings: \n");
         for (Map.Entry<String, E> entry : portfolio.entrySet()) {
             if (entry.getKey() != "Cash") {
                 Stock stock = (Stock) entry.getValue();
                 System.out.println(stock.toString());
             }
         }
+        System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
     }
 }

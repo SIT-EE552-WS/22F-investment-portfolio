@@ -52,7 +52,9 @@ public class Stock implements Serializable {
         double price = jsonObject.get("c").getAsDouble();
 
         if (price != 0) {
-            return price * quantity;
+            // return price * quantity;
+            setPrice();
+            return price;
         } else {
             System.out.println("Invalid stock name.");
             return 0;
@@ -82,6 +84,8 @@ public class Stock implements Serializable {
             return "Invalid stock name.";
         }
 
+        setPrice();
+
         return "Stock Name: " + name + ", Quantity: " + quantity + ", Price: " + price + "\n";
     }
 
@@ -98,14 +102,20 @@ public class Stock implements Serializable {
         return quantity;
     }
 
-    public double sellStock(double quantity2) {
+    public double sellStock(String name, double quantity2) throws IOException, InterruptedException {
+        double price = buyStock(name, quantity2);
         if (quantity2 > this.quantity) {
             System.out.println("You do not have enough stock to sell that amount.");
             return 0;
         } else {
             this.quantity -= quantity2;
-            return this.price * quantity2;
+            price = Math.round(price * 100.0) / 100.0;
+            return price * quantity2;
         }
+    }
+
+    public void setPrice() {
+        this.price = Math.round(this.price * 100.0) / 100.0;
     }
 
 }
