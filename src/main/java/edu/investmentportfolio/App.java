@@ -10,15 +10,15 @@ public class App {
     public static void main(String[] args) throws Exception {
         System.out.println("Investment Portfolio Simulator");
 
-        System.out.print("What is your first name?");
+        System.out.print("What is your first name? ");
         Scanner Obj_firstName = new Scanner(System.in);
         String firstname = Obj_firstName.nextLine();
 
-        System.out.print("\n What is your last name?");
+        System.out.print("\nWhat is your last name? ");
         Scanner Obj_lastName = new Scanner(System.in);
         String lastname = Obj_lastName.nextLine();
 
-        System.out.print("\n What is your starting balance for investment?");
+        System.out.print("\nWhat is your starting balance for investment? ");
         Scanner Obj_startingBalance = new Scanner(System.in);
         double startingBalance = Obj_startingBalance.nextDouble();
 
@@ -26,12 +26,12 @@ public class App {
 
         boolean running = true;
         while (running) {
-            System.out.println("1 - Buy");
+            System.out.println("\n1 - Buy");
             System.out.println("2 - Sell");
             System.out.println("3 - Value");
             System.out.println("4 - View");
             System.out.println("5 - Cash");
-            System.out.println("6 - Exit");
+            System.out.println("6 - Exit \n");
 
             Scanner myObj = new Scanner(System.in);
             int input = myObj.nextInt();
@@ -41,7 +41,7 @@ public class App {
                     while (true) {
                         System.out.println("1 - Stocks");
                         System.out.println("2 - Bonds");
-                        System.out.println("3 - Main Menu");
+                        System.out.println("3 - Main Menu \n");
                         Scanner buy = new Scanner(System.in);
                         int option = buy.nextInt();
 
@@ -50,27 +50,46 @@ public class App {
                             System.out.print("Please enter stock name: ");
                             Scanner stock_name = new Scanner(System.in);
                             String name = stock_name.nextLine();
-                            System.out.print("\n Please enter quantity: ");
+                            System.out.print("\nPlease enter quantity: ");
                             Scanner stock_quantity = new Scanner(System.in);
                             Double quantity = stock_quantity.nextDouble();
+                            System.out.print("\n");
                             user.addStock(name, quantity);
+
+                            // stock_name.close();
+                            // stock_quantity.close();
                             break;
 
                         } else if (option == 2) {
                             // Buy Bond
                             System.out.println("We offer a variety of multiyear bonds:");
-                            System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year");
+                            System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year\n");
 
                             System.out.print("Please enter bond name: ");
                             Scanner bond_name = new Scanner(System.in);
                             String name = bond_name.nextLine();
 
                             while (true) {
-                                if ((name != "30year") || (name != "20year") || (name != "10year") || (name != "7year")
-                                        || (name != "5year") || (name != "3year") || (name != "2year")) {
-                                    System.out.println("We do not offer that type of bond.");
-                                    continue;
+                                if (name != "30year") {
+                                    if (name != "20year") {
+                                        if (name != "10year") {
+                                            if (name != "7year") {
+                                                if (name != "5year") {
+                                                    if (name != "3year") {
+                                                        if (name != "2year") {
+                                                            System.out.println("We do not offer that type of bond.");
+                                                            System.out.println("Please enter bond name: ");
+                                                            Scanner new_name = new Scanner(System.in);
+                                                            name = new_name.nextLine();
+                                                            continue;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+
                                 break;
                             }
 
@@ -83,6 +102,10 @@ public class App {
                             Double quantity = bond_quantity.nextDouble();
 
                             user.addBond(name, value, quantity);
+
+                            // bond_value.close();
+                            // bond_name.close();
+                            // bond_quantity.close();
                             break;
 
                         } else if (option == 3) {
@@ -90,6 +113,7 @@ public class App {
                         } else {
                             System.out.println("Please pick one of the options.");
                         }
+                        // buy.close();
                     }
 
                     break;
@@ -116,6 +140,9 @@ public class App {
                             Scanner sell_quantity = new Scanner(System.in);
                             Double quantity = sell_quantity.nextDouble();
                             user.sellStock(name, quantity);
+
+                            // sell_name.close();
+                            // sell_quantity.close();
                             break;
 
                         } else if (option_sell == 2) {
@@ -128,15 +155,15 @@ public class App {
                             Scanner bond_sell = new Scanner(System.in);
                             String name2 = bond_sell.nextLine();
 
-                            while (true) {
-                                if ((name2 != "30year") || (name2 != "20year") || (name2 != "10year")
-                                        || (name2 != "7year")
-                                        || (name2 != "5year") || (name2 != "3year") || (name2 != "2year")) {
-                                    System.out.println("We do not offer that type of bond.");
-                                    continue;
-                                }
-                                break;
-                            }
+                            // while (true) {
+                            // if ((name2 != "30year") || (name2 != "20year") || (name2 != "10year")
+                            // || (name2 != "7year")
+                            // || (name2 != "5year") || (name2 != "3year") || (name2 != "2year")) {
+                            // System.out.println("We do not offer that type of bond.");
+                            // continue;
+                            // }
+                            // break;
+                            // }
 
                             System.out.print("\n Please enter amount: ");
                             Scanner bond_value2 = new Scanner(System.in);
@@ -148,11 +175,17 @@ public class App {
 
                             user.sellBond(name2, value2, quantity2);
 
+                            // bond_sell.close();
+                            // bond_value2.close();
+                            // bond_quantity2.close();
+                            break;
+
                         } else if (option_sell == 3) {
                             break;
                         } else {
                             System.out.println("Please pick one of the options.");
                         }
+                        // sell.close();
                     }
 
                     break;
@@ -225,6 +258,8 @@ public class App {
                         } else {
                             System.out.println("Please pick one of the options.");
                         }
+
+                        // view.close();
                     }
 
                     break;
@@ -244,6 +279,8 @@ public class App {
                             double option5withdraw = cashObjWithdraw.nextDouble();
                             user.withdrawCash(option5withdraw);
                             user.viewBalance();
+
+                            // cashObjWithdraw.close();
                             break;
 
                         } else if (option5 == 2) {
@@ -252,6 +289,8 @@ public class App {
                             double option5Deposit = cashObjDeposit.nextDouble();
                             user.addCash(option5Deposit);
                             user.viewBalance();
+
+                            // cashObjDeposit.close();
                             break;
 
                         } else if (option5 == 3) {
@@ -260,6 +299,7 @@ public class App {
                         } else {
                             System.out.println("Please pick one of the options.");
                         }
+                        // cashObj.close();
                     }
                     break;
 
