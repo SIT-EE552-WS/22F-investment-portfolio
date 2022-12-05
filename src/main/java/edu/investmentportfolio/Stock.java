@@ -32,6 +32,7 @@ public class Stock implements Serializable {
         // this.yield = yield;
     }
 
+//This function really just gets the price of the stock, not actually buys it/updates the hashmap
     public double buyStock(String name, double quantity) throws IOException, InterruptedException {
         Properties props = new Properties();
         InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("api.properties");
