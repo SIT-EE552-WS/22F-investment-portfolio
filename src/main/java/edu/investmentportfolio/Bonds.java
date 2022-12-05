@@ -1,4 +1,5 @@
 package edu.investmentportfolio;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -28,7 +29,7 @@ public class Bonds implements Serializable {
     private int expMonth;
     private int expYear;
     // 1 3 4 6
-    //131514208
+    // 131514208
     final double month1US = 3.829;
     final double month3US = 4.327;
     final double month4US = 4.522;
@@ -46,7 +47,9 @@ public class Bonds implements Serializable {
 
     public Bonds() {
     }
-    public Bonds(String bondSymbol,  double faceValue, double quantity, double coupon, double yield, int expMonth, int expYear) {
+
+    public Bonds(String bondSymbol, double faceValue, double quantity, double coupon, double yield, int expMonth,
+            int expYear) {
         this.bondSymbol = bondSymbol;
         this.faceValue = faceValue;
         this.quantity = quantity;
@@ -56,15 +59,9 @@ public class Bonds implements Serializable {
         this.yield = yield;
     }
 
-    public static void buy(double bond) {
-        // buying the bond
+    public double getFaceValue() {
+        return this.faceValue;
     }
-
-    public static void cashIn(double bond) {
-        // cashing in the bond, should increase the over cash of the user
-    }
-
-    public double getFaceValue() {return this.faceValue;}
 
     public double getYield() {
         return this.yield;
@@ -73,26 +70,26 @@ public class Bonds implements Serializable {
     public double getExpMonth() {
         return this.expMonth;
     }
+
     public double getExpYear() {
         return this.expYear;
     }
 
-    //Like Stocks this is just getting the sell price
-
+    // Like Stocks this is just getting the sell price
 
     public double buyBonds(String name, double faceValue, double quantity) throws IOException, InterruptedException {
         /*
-            month3US =3.829; 0
-            month4US = 4.488; 0
-            month6US = 4.666; 0
-            year1US = 4.69; 0
-            year2US = 4.279; 4.50
-            year3US = 3.986; 4.50
-            year5US = 3.652; 3.875
-            year7US = 3.588; 3.875
-            year10US = 3.486; 4.125
-            year20US = 3.764; 4
-            year30US = 3.541; 4.00
+         * month3US =3.829; 0
+         * month4US = 4.488; 0
+         * month6US = 4.666; 0
+         * year1US = 4.69; 0
+         * year2US = 4.279; 4.50
+         * year3US = 3.986; 4.50
+         * year5US = 3.652; 3.875
+         * year7US = 3.588; 3.875
+         * year10US = 3.486; 4.125
+         * year20US = 3.764; 4
+         * year30US = 3.541; 4.00
          */
         Properties props = new Properties();
         InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("BondsClassifier.properties");
@@ -100,17 +97,18 @@ public class Bonds implements Serializable {
             props.load(inputStream);
         }
         int num = setYear(name);
-        String combine = "cusip"+num;
+        String combine = "cusip" + num;
         String cusip = props.getProperty(combine);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://www.treasurydirect.gov/TA_WS/securities/search?cusip="+ cusip+"&format=json"))
+                .uri(URI.create(
+                        "https://www.treasurydirect.gov/TA_WS/securities/search?cusip=" + cusip + "&format=json"))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        //System.out.println(response.body());
+        // System.out.println(response.body());
         JSONArray obj = new JSONArray(response.body());
-        //System.out.println(obj.getJSONObject(0).getString("pricePer100"));
+        // System.out.println(obj.getJSONObject(0).getString("pricePer100"));
         double price = Double.parseDouble(obj.getJSONObject(0).getString("pricePer100"));
         System.out.println(combine + " / " + price);
         if (price != 0) {
@@ -120,8 +118,6 @@ public class Bonds implements Serializable {
             return 0;
         }
     }
-
-
 
     public static int setYear(String name) throws IOException, InterruptedException {
         if (name == "30year") {
@@ -138,21 +134,24 @@ public class Bonds implements Serializable {
             return 3;
         } else if (name == "2year") {
             return 2;
-        } else{
+        } else {
             return 0;
         }
     }
 
     @Override
     public String toString() {
-        return "Bond Name: " + bondSymbol +", Face Value: " + faceValue + ", Quantity: " + quantity +  ", Expiration Date: " + expMonth + "/" + expYear + "\n";
+        return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue + ", Quantity: " + quantity
+                + ", Expiration Date: " + expMonth + "/" + expYear + "\n";
     }
+
     public String viewBonds(String name, double quantity) throws IOException, InterruptedException {
         if (faceValue == 0) {
             return "Invalid stock name.";
         }
-        //setfaceValue();
-        return "Bond Name: " + bondSymbol +", Face Value: " + faceValue + ", Quantity: " + quantity +  ", Expiration Date: " + expMonth + "/" + expYear + "\n";
+        // setfaceValue();
+        return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue + ", Quantity: " + quantity
+                + ", Expiration Date: " + expMonth + "/" + expYear + "\n";
     }
 
     public void addQuantity(double quantity2) {
@@ -174,6 +173,7 @@ public class Bonds implements Serializable {
             return sellPrice * quantity2;
         }
     }
+
     public void setfaceValue() {
         this.faceValue = Math.round(this.faceValue * 100.0) / 100.0;
     }
