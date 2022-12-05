@@ -89,7 +89,7 @@ public class Account<E> implements Serializable {
         System.out.println("________________________________________________________");
         System.out.println("Current Stock Holdings: \n");
         for (Map.Entry<String, E> entry : portfolio.entrySet()) {
-            if (entry.getKey() != "Cash") {
+            if ((entry.getKey() != "Cash")&&(entry.getKey() != "Bonds")) {
                 Stock stock = (Stock) entry.getValue();
                 System.out.println(stock.toString());
             }

@@ -12,16 +12,24 @@ public class App {
 
         user.addCash(1000);
         user.viewBalance();
-        user.addStock("AAPL", 3.0);
-        user.viewStocks();
-        user.addStock("AAPL", 3);
-        user.sellStock("AAPL", 5);
-        user.viewPortfolio();
-        user.addStock("MSFT", 1);
-        user.viewPortfolio();
-        user.addStock("MSFT", 10);
+        user.addBond("month1", 1);
+        user.viewBonds();
 
          */
+
+        Account2Bonds userBonds = new Account2Bonds();
+
+        userBonds.addCash(100000);
+        userBonds.viewBalance();
+        userBonds.addBond("30year", 8, 6);
+        userBonds.addBond("7year", 100, 4);
+        userBonds.addBond("2year", 100, 4);
+        userBonds.viewBalance();
+        userBonds.viewBonds();
+        userBonds.sellBonds("30year", 100, 3);
+        userBonds.sellBonds("7year", 100, 3);
+        userBonds.viewBonds();
+        userBonds.viewBalance();
     }
 }
 //The following is the old code I was working on
