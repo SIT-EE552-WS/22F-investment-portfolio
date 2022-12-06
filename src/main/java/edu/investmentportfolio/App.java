@@ -66,11 +66,12 @@ public class App {
                             System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year\n");
 
                             System.out.print("Please enter bond name: ");
-                            Scanner bond_name = new Scanner(System.in);
-                            String name = bond_name.nextLine();
+                            Scanner bond_name_year = new Scanner(System.in);
+                            String name = bond_name_year.nextLine();
 
                             while (true) {
-                                if (name != "30year") {
+                                if (!"30year".equals(name)) {
+                                    System.out.println("this is the name: "+ name);
                                     if (name != "20year") {
                                         if (name != "10year") {
                                             if (name != "7year") {
