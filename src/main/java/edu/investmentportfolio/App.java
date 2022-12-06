@@ -70,27 +70,13 @@ public class App {
                             String name = bond_name_year.nextLine();
 
                             while (true) {
-                                if (!"30year".equals(name)) {
-                                    System.out.println("this is the name: "+ name);
-                                    if (name != "20year") {
-                                        if (name != "10year") {
-                                            if (name != "7year") {
-                                                if (name != "5year") {
-                                                    if (name != "3year") {
-                                                        if (name != "2year") {
-                                                            System.out.println("We do not offer that type of bond.");
-                                                            System.out.println("Please enter bond name: ");
-                                                            Scanner new_name = new Scanner(System.in);
-                                                            name = new_name.nextLine();
-                                                            continue;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                if ((!"30year".equals(name)) && (!"20year".equals(name)) && (!"10year".equals(name))
+                                        && (!"7year".equals(name))
+                                        && (!"5year".equals(name)) && (!"3year".equals(name))
+                                        && (!"2year".equals(name))) {
+                                    System.out.println("We do not offer that type of bond.");
+                                    continue;
                                 }
-
                                 break;
                             }
 
@@ -154,17 +140,18 @@ public class App {
 
                             System.out.print("Please enter bond name: ");
                             Scanner bond_sell = new Scanner(System.in);
-                            String name2 = bond_sell.nextLine();
+                            String name = bond_sell.nextLine();
 
-                            // while (true) {
-                            // if ((name2 != "30year") || (name2 != "20year") || (name2 != "10year")
-                            // || (name2 != "7year")
-                            // || (name2 != "5year") || (name2 != "3year") || (name2 != "2year")) {
-                            // System.out.println("We do not offer that type of bond.");
-                            // continue;
-                            // }
-                            // break;
-                            // }
+                            while (true) {
+                                if ((!"30year".equals(name)) && (!"20year".equals(name)) && (!"10year".equals(name))
+                                        && (!"7year".equals(name))
+                                        && (!"5year".equals(name)) && (!"3year".equals(name))
+                                        && (!"2year".equals(name))) {
+                                    System.out.println("We do not offer that type of bond.");
+                                    continue;
+                                }
+                                break;
+                            }
 
                             System.out.print("\n Please enter amount: ");
                             Scanner bond_value2 = new Scanner(System.in);
@@ -174,7 +161,7 @@ public class App {
                             Scanner bond_quantity2 = new Scanner(System.in);
                             Double quantity2 = bond_quantity2.nextDouble();
 
-                            user.sellBond(name2, value2, quantity2);
+                            user.sellBond(name, value2, quantity2);
 
                             // bond_sell.close();
                             // bond_value2.close();

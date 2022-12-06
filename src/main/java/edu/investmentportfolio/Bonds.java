@@ -120,19 +120,20 @@ public class Bonds implements Serializable {
     }
 
     public static int setYear(String name) throws IOException, InterruptedException {
-        if (name == "30year") {
+
+        if ("30year".equals(name)) {
             return 30;
-        } else if (name == "20year") {
+        } else if ("20year".equals(name)) {
             return 20;
-        } else if (name == "10year") {
+        } else if ("10year".equals(name)) {
             return 10;
-        } else if (name == "7year") {
+        } else if ("7year".equals(name)) {
             return 7;
-        } else if (name == "5year") {
+        } else if ("5year".equals(name)) {
             return 5;
-        } else if (name == "3year") {
+        } else if ("3year".equals(name)) {
             return 3;
-        } else if (name == "2year") {
+        } else if ("2year".equals(name)) {
             return 2;
         } else {
             return 0;
