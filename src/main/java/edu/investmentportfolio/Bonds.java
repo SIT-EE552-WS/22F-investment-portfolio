@@ -78,19 +78,6 @@ public class Bonds implements Serializable {
     // Like Stocks this is just getting the sell price
 
     public double buyBonds(String name, double faceValue, double quantity) throws IOException, InterruptedException {
-        /*
-         * month3US =3.829; 0
-         * month4US = 4.488; 0
-         * month6US = 4.666; 0
-         * year1US = 4.69; 0
-         * year2US = 4.279; 4.50
-         * year3US = 3.986; 4.50
-         * year5US = 3.652; 3.875
-         * year7US = 3.588; 3.875
-         * year10US = 3.486; 4.125
-         * year20US = 3.764; 4
-         * year30US = 3.541; 4.00
-         */
         Properties props = new Properties();
         InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("BondsClassifier.properties");
         if (inputStream != null) {
@@ -106,7 +93,7 @@ public class Bonds implements Serializable {
                         "https://www.treasurydirect.gov/TA_WS/securities/search?cusip=" + cusip + "&format=json"))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        // System.out.println(response.body());
+        // System.out.println(response.body())
         JSONArray obj = new JSONArray(response.body());
         // System.out.println(obj.getJSONObject(0).getString("pricePer100"));
         double price = Double.parseDouble(obj.getJSONObject(0).getString("pricePer100"));
@@ -150,7 +137,6 @@ public class Bonds implements Serializable {
         if (faceValue == 0) {
             return "Invalid stock name.";
         }
-        // setfaceValue();
         return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue + ", Quantity: " + quantity
                 + ", Expiration Date: " + expMonth + "/" + expYear + "\n";
     }

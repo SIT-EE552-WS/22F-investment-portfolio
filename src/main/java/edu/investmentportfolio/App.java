@@ -65,11 +65,13 @@ public class App {
                             System.out.println("We offer a variety of multiyear bonds:");
                             System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year\n");
 
-                            System.out.print("Please enter bond name: ");
-                            Scanner bond_name_year = new Scanner(System.in);
-                            String name = bond_name_year.nextLine();
+
 
                             while (true) {
+                                System.out.print("Please enter bond name: ");
+                                Scanner bond_name_year = new Scanner(System.in);
+                                String name = bond_name_year.nextLine();
+
                                 if ((!"30year".equals(name)) && (!"20year".equals(name)) && (!"10year".equals(name))
                                         && (!"7year".equals(name))
                                         && (!"5year".equals(name)) && (!"3year".equals(name))
@@ -77,19 +79,19 @@ public class App {
                                     System.out.println("We do not offer that type of bond.");
                                     continue;
                                 }
+                                else{
+                                    System.out.print("\n Please enter amount requesting: ");
+                                    Scanner bond_value = new Scanner(System.in);
+                                    Double value = bond_value.nextDouble();
+
+                                    System.out.print("\n Please enter quantity: ");
+                                    Scanner bond_quantity = new Scanner(System.in);
+                                    Double quantity = bond_quantity.nextDouble();
+
+                                    user.addBond(name, value, quantity);
+                                }
                                 break;
                             }
-
-                            System.out.print("\n Please enter amount requesting: ");
-                            Scanner bond_value = new Scanner(System.in);
-                            Double value = bond_value.nextDouble();
-
-                            System.out.print("\n Please enter quantity: ");
-                            Scanner bond_quantity = new Scanner(System.in);
-                            Double quantity = bond_quantity.nextDouble();
-
-                            user.addBond(name, value, quantity);
-
                             // bond_value.close();
                             // bond_name.close();
                             // bond_quantity.close();
@@ -138,11 +140,11 @@ public class App {
                             user.viewBonds();
                             System.out.println("_________________");
 
-                            System.out.print("Please enter bond name: ");
-                            Scanner bond_sell = new Scanner(System.in);
-                            String name = bond_sell.nextLine();
-
                             while (true) {
+                                System.out.print("Please enter bond name: ");
+                                Scanner bond_sell = new Scanner(System.in);
+                                String name = bond_sell.nextLine();
+
                                 if ((!"30year".equals(name)) && (!"20year".equals(name)) && (!"10year".equals(name))
                                         && (!"7year".equals(name))
                                         && (!"5year".equals(name)) && (!"3year".equals(name))
@@ -150,19 +152,19 @@ public class App {
                                     System.out.println("We do not offer that type of bond.");
                                     continue;
                                 }
+                                else{
+                                    System.out.print("\n Please enter amount: ");
+                                    Scanner bond_value2 = new Scanner(System.in);
+                                    Double value2 = bond_value2.nextDouble();
+
+                                    System.out.print("\n Please enter quantity: ");
+                                    Scanner bond_quantity2 = new Scanner(System.in);
+                                    Double quantity2 = bond_quantity2.nextDouble();
+
+                                    user.sellBond(name, value2, quantity2);
+                                }
                                 break;
                             }
-
-                            System.out.print("\n Please enter amount: ");
-                            Scanner bond_value2 = new Scanner(System.in);
-                            Double value2 = bond_value2.nextDouble();
-
-                            System.out.print("\n Please enter quantity: ");
-                            Scanner bond_quantity2 = new Scanner(System.in);
-                            Double quantity2 = bond_quantity2.nextDouble();
-
-                            user.sellBond(name, value2, quantity2);
-
                             // bond_sell.close();
                             // bond_value2.close();
                             // bond_quantity2.close();
