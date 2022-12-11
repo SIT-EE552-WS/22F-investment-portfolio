@@ -182,12 +182,14 @@ public class App {
 
                 case 3:
                     while (true) {
-                        Scanner value = new Scanner(System.in);
-                        int option3 = value.nextInt();
+
                         System.out.println("1 - Stocks");
                         System.out.println("2 - Bonds");
                         System.out.println("3 - Portfolio");
                         System.out.println("4 - Main Menu");
+
+                        Scanner value = new Scanner(System.in);
+                        int option3 = value.nextInt();
 
                         // TODO create a function that gathers the values of every Stock and shows it to
                         // the user
@@ -197,7 +199,9 @@ public class App {
                         // shows it to the user
 
                         if (option3 == 1) {
-                            // Value of Stocks
+                            System.out.println("The value of your stocks is: ");
+                            user.valueStocks();
+                            break;
 
                         } else if (option3 == 2) {
                             // Value of Bonds

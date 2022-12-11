@@ -67,6 +67,18 @@ public class Account<E> implements Serializable {
             }
         }
     }
+    public void valueStocks() {
+        double sum=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Stock) {
+                Stock stock = (Stock) entry.getValue();
+                sum += stock.getQuantity()*stock.getPrice();
+                System.out.println(stock.getStockname()+": $" + stock.getQuantity()*stock.getPrice());
+            }
+        }
+        sum = Math.round(sum * 100.0) / 100.0;
+        System.out.println("Total value = $" + sum);
+    }
 
     public void sellStock(String name, double quantity) throws IOException, InterruptedException {
         if (portfolio.containsKey(name)) {

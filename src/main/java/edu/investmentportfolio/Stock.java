@@ -103,6 +103,9 @@ public class Stock implements Serializable {
         return quantity;
     }
 
+    public double getPrice(){return price;}
+
+    public String getStockname(){return stockname;}
     public double sellStock(String name, double quantity2) throws IOException, InterruptedException {
         double price = buyStock(name, quantity2);
         if (quantity2 > this.quantity) {
