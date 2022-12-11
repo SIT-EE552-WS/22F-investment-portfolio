@@ -24,7 +24,7 @@ public class Bonds implements Serializable {
     private String bondSymbol;
     private double faceValue;
     private double quantity;
-    private double coupon;
+    private double couponRate;
     private double yield;
     private int expMonth;
     private int expYear;
@@ -48,12 +48,12 @@ public class Bonds implements Serializable {
     public Bonds() {
     }
 
-    public Bonds(String bondSymbol, double faceValue, double quantity, double coupon, double yield, int expMonth,
-            int expYear) {
+    public Bonds(String bondSymbol, double faceValue, double quantity,
+                 double couponRate, double yield, int expMonth, int expYear) {
         this.bondSymbol = bondSymbol;
         this.faceValue = faceValue;
         this.quantity = quantity;
-        this.coupon = coupon;
+        this.couponRate = couponRate;
         this.expMonth = expMonth;
         this.expYear = expYear;
         this.yield = yield;
@@ -97,6 +97,7 @@ public class Bonds implements Serializable {
         JSONArray obj = new JSONArray(response.body());
         // System.out.println(obj.getJSONObject(0).getString("pricePer100"));
         double price = Double.parseDouble(obj.getJSONObject(0).getString("pricePer100"));
+        // AverageMedianYield
         System.out.println(combine + " / " + price);
         if (price != 0) {
             return price;
@@ -106,6 +107,54 @@ public class Bonds implements Serializable {
         }
     }
 
+    public static double getBondInfo(String name, double faceValue, double quantity, int numChoice) throws IOException, InterruptedException {
+        Properties props = new Properties();
+        InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("BondsClassifier.properties");
+        if (inputStream != null) {
+            props.load(inputStream);
+        }
+        int num = setYear(name);
+        String combine = "cusip" + num;
+        String cusip = props.getProperty(combine);
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(
+                        "https://www.treasurydirect.gov/TA_WS/securities/search?cusip=" + cusip + "&format=json"))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        // System.out.println(response.body())
+        JSONArray obj = new JSONArray(response.body());
+        // System.out.println(obj.getJSONObject(0).getString("pricePer100"));
+        double yield;
+        if ("".equals(obj.getJSONObject(0).getString("averageMedianYield"))){
+            yield = Double.parseDouble(obj.getJSONObject(1).getString("averageMedianYield"));
+        }else{
+            yield = Double.parseDouble(obj.getJSONObject(0).getString("averageMedianYield"));
+        }
+
+        double couRate = Double.parseDouble(obj.getJSONObject(0).getString("interestRate"));
+        //System.out.println(combine + " / " + yield);
+
+        switch(numChoice){
+            case 1:
+                if (yield != 0) {
+                    return yield;
+                } else {
+                    System.out.println("YIELD NOT FOUND");
+                    return 0;
+                }
+            case 2:
+                if (couRate != 0) {
+                    return couRate;
+                } else {
+                    System.out.println("COUPON RATE NOT FOUND");
+                    return 0;
+                }
+            default:
+                return 0;
+        }
+    }
     public static int setYear(String name) throws IOException, InterruptedException {
 
         if ("30year".equals(name)) {
@@ -129,7 +178,9 @@ public class Bonds implements Serializable {
 
     @Override
     public String toString() {
-        return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue + ", Quantity: " + quantity
+        return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue
+                + ", Coupon Rate: " + couponRate
+                + ", Quantity: " + quantity + ", Yield: " + yield
                 + ", Expiration Date: " + expMonth + "/" + expYear + "\n";
     }
 
@@ -137,7 +188,9 @@ public class Bonds implements Serializable {
         if (faceValue == 0) {
             return "Invalid stock name.";
         }
-        return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue + ", Quantity: " + quantity
+        return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue
+                + ", Coupon Rate: " + couponRate
+                + ", Quantity: " + quantity + ", Yield: " + yield
                 + ", Expiration Date: " + expMonth + "/" + expYear + "\n";
     }
 

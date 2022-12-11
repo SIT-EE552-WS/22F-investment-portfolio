@@ -110,6 +110,8 @@ public class Account<E> implements Serializable {
             cal.add(Calendar.DATE, val); // adds however many years
             int expMonth = cal.get(Calendar.MONTH) + 1; // January starts at 0 for some reason so, I have to add 1
             int expYear = cal.get(Calendar.YEAR);
+            double couRate = Bonds.getBondInfo(name, faceValue,  quantity, 2);
+            double yieldVal = Bonds.getBondInfo(name, faceValue,  quantity, 1);
 
             if (price != 0) {
                 if (this.cash.getBalance() < amount) {
@@ -121,7 +123,7 @@ public class Account<E> implements Serializable {
                         Bonds bond = (Bonds) portfolio.get(name);
                         bond.addQuantity(quantity);
                     } else {
-                        Bonds bond = new Bonds(name, price, quantity, 8, quantity, expMonth, expYear);
+                        Bonds bond = new Bonds(name, price, quantity, couRate, yieldVal, expMonth, expYear);
                         portfolio.put(name, (E) bond);
                     }
                 }

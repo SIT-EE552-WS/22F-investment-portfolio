@@ -65,8 +65,6 @@ public class App {
                             System.out.println("We offer a variety of multiyear bonds:");
                             System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year\n");
 
-
-
                             while (true) {
                                 System.out.print("Please enter bond name: ");
                                 Scanner bond_name_year = new Scanner(System.in);
