@@ -95,6 +95,7 @@ public class App {
                             break;
 
                         } else if (option == 3) {
+                            //Buy Crypto
                             System.out.print("Please enter crypto name: ");
                             Scanner crypto_name = new Scanner(System.in);
                             String name = crypto_name.nextLine();
@@ -192,24 +193,18 @@ public class App {
 
                         Scanner value = new Scanner(System.in);
                         int option3 = value.nextInt();
-
-                        // TODO create a function that gathers the values of every Stock and shows it to
-                        // the user
-                        // TODO create a function that gathers the values of every Bond and shows it to
-                        // the user
-                        // TODO create a function that gathers the values of both Stocks and Bonds and
-                        // shows it to the user
-
                         if (option3 == 1) {
+                            // Value of Stocks
                             System.out.println("The value of your stocks is: ");
                             user.valueStocks();
                             break;
-
                         } else if (option3 == 2) {
+                            // Value of Bonds
                             System.out.println("The present value of your bonds is: ");
                             user.valueBonds();
                             break;
                         } else if (option3 == 3) {
+                            // Value of Crypto
                             System.out.println("The present value of your crypto is: ");
                             user.valueCrypto();
                             break;
@@ -251,6 +246,7 @@ public class App {
                             break;
 
                         } else if (option4 == 3) {
+                            // View Crypto
                             System.out.println("You own these cryptocurrencies: ");
                             user.viewCrypto();
                             break;
@@ -266,8 +262,6 @@ public class App {
                         } else {
                             System.out.println("Please pick one of the options.");
                         }
-
-                        // view.close();
                     }
 
                     break;
@@ -287,18 +281,15 @@ public class App {
                             double option5withdraw = cashObjWithdraw.nextDouble();
                             user.withdrawCash(option5withdraw);
                             user.viewBalance();
-
-                            // cashObjWithdraw.close();
                             break;
 
                         } else if (option5 == 2) {
+                            // Deposit
                             System.out.println("How much would you like to deposit?");
                             Scanner cashObjDeposit = new Scanner(System.in);
                             double option5Deposit = cashObjDeposit.nextDouble();
                             user.addCash(option5Deposit);
                             user.viewBalance();
-
-                            // cashObjDeposit.close();
                             break;
 
                         } else if (option5 == 3) {
