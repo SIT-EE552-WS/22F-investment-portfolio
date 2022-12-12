@@ -377,6 +377,7 @@ public class Account<E> implements Serializable {
 
         new SwingWrapper(chart).displayChart();
 
-        BitmapEncoder.saveBitmapWithDPI(chart, "./FinancialInstrumentsGraph", BitmapEncoder.BitmapFormat.PNG, 300);
+        //Uncomment the following line if you want to save the graph:
+        //BitmapEncoder.saveBitmapWithDPI(chart, "./FinancialInstrumentsGraph", BitmapEncoder.BitmapFormat.PNG, 300);
     }
 }
