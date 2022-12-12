@@ -30,23 +30,6 @@ public class Bonds implements Serializable {
     private double yield;
     private int expMonth;
     private int expYear;
-    // 1 3 4 6
-    // 131514208
-    final double month1US = 3.829;
-    final double month3US = 4.327;
-    final double month4US = 4.522;
-    final double month6US = 4.7;
-    // 1 2 3 5 7 10 20 30
-    //
-    final double year1US = 4.711;
-    final double year2US = 4.309;
-    final double year3US = 4.022;
-    final double year5US = 3.697;
-    final double year7US = 3.635;
-    final double year10US = 3.532;
-    final double year20US = 3.804;
-    final double year30US = 3.582;
-
     public Bonds() {
     }
 
