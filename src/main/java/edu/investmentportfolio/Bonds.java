@@ -62,6 +62,9 @@ public class Bonds implements Serializable {
     public double getFaceValue() {
         return this.faceValue;
     }
+    public String getBondSymbol() {
+        return this.bondSymbol;
+    }
 
     public double getYield() {
         return this.yield;
@@ -155,7 +158,7 @@ public class Bonds implements Serializable {
                 return 0;
         }
     }
-    public static int setYear(String name) throws IOException, InterruptedException {
+    public static int setYear(String name){
 
         if ("30year".equals(name)) {
             return 30;
@@ -184,16 +187,6 @@ public class Bonds implements Serializable {
                 + ", Expiration Date: " + expMonth + "/" + expYear + "\n";
     }
 
-    public String viewBonds(String name, double quantity) throws IOException, InterruptedException {
-        if (faceValue == 0) {
-            return "Invalid stock name.";
-        }
-        return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue
-                + ", Coupon Rate: " + couponRate
-                + ", Quantity: " + quantity + ", Yield: " + yield
-                + ", Expiration Date: " + expMonth + "/" + expYear + "\n";
-    }
-
     public void addQuantity(double quantity2) {
         this.quantity += quantity2;
     }
@@ -202,8 +195,8 @@ public class Bonds implements Serializable {
         return quantity;
     }
 
-    public double sellBonds(String name, double faceValue, double quantity2) throws IOException, InterruptedException {
-        double sellPrice = buyBonds(name, faceValue, quantity2);
+    public double sellBonds(String name, double quantity2) throws IOException, InterruptedException {
+        double sellPrice = faceValue;
         if (quantity2 > this.quantity) {
             System.out.println("You do not have enough bonds to sell that amount.");
             return 0;
@@ -213,8 +206,8 @@ public class Bonds implements Serializable {
             return sellPrice * quantity2;
         }
     }
-
-    public void setfaceValue() {
-        this.faceValue = Math.round(this.faceValue * 100.0) / 100.0;
+    public double getPresentValue() {
+        double Q = this.quantity;
+        return 5;
     }
 }

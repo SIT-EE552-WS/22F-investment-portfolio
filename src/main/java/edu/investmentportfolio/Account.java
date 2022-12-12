@@ -119,10 +119,13 @@ public class Account<E> implements Serializable {
                 } else {
                     System.out.println(name + " bought at " + price);
                     this.cash.withdraw(amount);
+                    //now here
+                    name = name+"("+price+")";
                     if (portfolio.containsKey(name)) {
                         Bonds bond = (Bonds) portfolio.get(name);
                         bond.addQuantity(quantity);
                     } else {
+                        // was here
                         Bonds bond = new Bonds(name, price, quantity, couRate, yieldVal, expMonth, expYear);
                         portfolio.put(name, (E) bond);
                     }
@@ -142,13 +145,27 @@ public class Account<E> implements Serializable {
         }
     }
 
-    public void sellBond(String name, double faceValue, double quantity) throws IOException, InterruptedException {
+    public void valueBonds() {
+        double sum=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Bonds) {
+                Bonds bond = (Bonds) entry.getValue();
+                sum += bond.getPresentValue();
+                System.out.println(bond.getBondSymbol()+": $" + bond.getPresentValue());
+            }
+        }
+        sum = Math.round(sum * 100.0) / 100.0;
+        System.out.println("Total present value = $" + sum);
+    }
+
+    // TODO This is what I am changing
+    public void sellBond(String name, double quantity) throws IOException, InterruptedException {
         if (portfolio.containsKey(name)) {
             Bonds bond = (Bonds) portfolio.get(name);
             if (bond.getQuantity() < quantity) {
                 System.out.println("You do not have enough bonds to sell that amount.");
             } else {
-                double price = bond.sellBonds(name, faceValue, quantity);
+                double price = bond.sellBonds(name, quantity);
                 // double price = bond.sellBonds(name, quantity)
                 this.cash.deposit(price);
                 if (bond.getQuantity() == 0) {
@@ -182,6 +199,40 @@ public class Account<E> implements Serializable {
                 System.out.println(bond.toString());
             }
         }
+        System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
+    }
+
+    public void valuePortfolio() {
+        System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
+        System.out.println("Account Holder: " + this.firstName + " " + this.lastName + "\n");
+        System.out.println("Cash Balance: " + this.cash.getBalance() + "\n");
+
+        System.out.println("________________________________________________________");
+        System.out.println("Current Stock Holdings: \n");
+        double sumStock=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Stock) {
+                Stock stock = (Stock) entry.getValue();
+                sumStock += stock.getQuantity()*stock.getPrice();
+                System.out.println(stock.getStockname()+": $" + stock.getQuantity()*stock.getPrice());
+            }
+        }
+        sumStock = Math.round(sumStock * 100.0) / 100.0;
+        System.out.println("Total Stock Value = $" + sumStock);
+        System.out.println("________________________________________________________");
+        System.out.println("Current Bond Holdings: \n");
+        double sumBond=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Bonds) {
+                Bonds bond = (Bonds) entry.getValue();
+                sumBond += bond.getPresentValue();
+                System.out.println(bond.getBondSymbol()+": $" + bond.getPresentValue());
+            }
+        }
+        sumBond = Math.round(sumBond * 100.0) / 100.0;
+        System.out.println("Total Bond Value = $" + sumBond);
+        System.out.println("________________________________________________________");
+        System.out.println("Total Portfolio Value = $" + (sumStock+sumBond));
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
     }
 }
