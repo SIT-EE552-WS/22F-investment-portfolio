@@ -16,6 +16,8 @@ import java.util.Properties;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.swing.plaf.synth.SynthToggleButtonUI;
+
 //Bond/fixed income (price, coupon, yield, expdate)
 // yield is the same as coupon rate
 
@@ -96,11 +98,8 @@ public class Bonds implements Serializable {
                         "https://www.treasurydirect.gov/TA_WS/securities/search?cusip=" + cusip + "&format=json"))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        // System.out.println(response.body())
         JSONArray obj = new JSONArray(response.body());
-        // System.out.println(obj.getJSONObject(0).getString("pricePer100"));
         double price = Double.parseDouble(obj.getJSONObject(0).getString("pricePer100"));
-        // AverageMedianYield
         System.out.println(combine + " / " + price);
         if (price != 0) {
             return price;
@@ -126,18 +125,14 @@ public class Bonds implements Serializable {
                         "https://www.treasurydirect.gov/TA_WS/securities/search?cusip=" + cusip + "&format=json"))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        // System.out.println(response.body())
         JSONArray obj = new JSONArray(response.body());
-        // System.out.println(obj.getJSONObject(0).getString("pricePer100"));
         double yield;
         if ("".equals(obj.getJSONObject(0).getString("averageMedianYield"))){
             yield = Double.parseDouble(obj.getJSONObject(1).getString("averageMedianYield"));
         }else{
             yield = Double.parseDouble(obj.getJSONObject(0).getString("averageMedianYield"));
         }
-
         double couRate = Double.parseDouble(obj.getJSONObject(0).getString("interestRate"));
-        //System.out.println(combine + " / " + yield);
 
         switch(numChoice){
             case 1:
@@ -207,7 +202,18 @@ public class Bonds implements Serializable {
         }
     }
     public double getPresentValue() {
-        double Q = this.quantity;
-        return 5;
+        // Formula taken from https://www.wallstreetmojo.com/bond-pricing-formula/
+        double n = 2; //treasury bonds are semi-annual
+        double t = expYear - 2022;
+        double YTM = 0.0377; // This value (3.77%) was taken from averaging multiple YTMs for different bonds using data from https://ycharts.com/indicators
+        // (ex. YTM for a 7-year bond is 3.69 from https://ycharts.com/indicators/7_year_treasury_rate )
+        double newCouponRate = couponRate/100;
+
+        double valueFromInterest = (1-Math.pow((1+(YTM/n)),(-n*t)))/(YTM/n);
+        double valueFromRedemption = faceValue/Math.pow((1+(YTM/2)),(n*t));
+        double Coupon = (faceValue*(newCouponRate))/n;
+        double PV= Coupon*valueFromInterest+valueFromRedemption;
+
+        return PV*quantity;
     }
 }
