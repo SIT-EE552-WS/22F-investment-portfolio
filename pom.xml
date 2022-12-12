@@ -31,6 +31,11 @@
        <version>2.13.0</version>
     </dependency>
     <dependency>
+      <groupId>org.knowm.xchart</groupId>
+      <artifactId>xchart</artifactId>
+      <version>3.6.2</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.8.9</version>
@@ -87,6 +92,14 @@
       </plugins>
     </pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-maven-plugin</artifactId>
+          <version>0.0.8</version>
+          <configuration>
+            <mainClass>Account</mainClass>
+          </configuration>
+        </plugin>
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>

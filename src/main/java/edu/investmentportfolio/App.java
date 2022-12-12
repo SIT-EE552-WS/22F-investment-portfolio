@@ -7,6 +7,7 @@ import java.util.Scanner;
  *
  */
 public class App {
+
     public static void main(String[] args) throws Exception {
         System.out.println("Investment Portfolio Simulator");
 
@@ -31,7 +32,8 @@ public class App {
             System.out.println("3 - Value");
             System.out.println("4 - View");
             System.out.println("5 - Cash");
-            System.out.println("6 - Exit \n");
+            System.out.println("6 - Graph");
+            System.out.println("7 - Exit \n");
 
             Scanner myObj = new Scanner(System.in);
             int input = myObj.nextInt();
@@ -304,10 +306,12 @@ public class App {
                         } else {
                             System.out.println("Please pick one of the options.");
                         }
-                        // cashObj.close();
                     }
                     break;
-
+                case 6:
+                    System.out.println("Here is a graph of your financial instruments");
+                    user.holdingsGraph();
+                    break;
                 default:
                     System.out.println("Program has been terminated");
                     running = false;

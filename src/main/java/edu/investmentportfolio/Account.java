@@ -7,6 +7,12 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.knowm.xchart.*;
+import org.knowm.xchart.style.PieStyler;
+import org.knowm.xchart.style.Styler;
+
+
+
 public class Account<E> implements Serializable {
     private static final long serialVersionUID = 4L;
     private Map<String, E> portfolio = new HashMap<String, E>();
@@ -78,6 +84,17 @@ public class Account<E> implements Serializable {
         }
         sum = Math.round(sum * 100.0) / 100.0;
         System.out.println("Total value = $" + sum);
+    }
+    public double getValueStocks() {
+        double sum=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Stock) {
+                Stock stock = (Stock) entry.getValue();
+                sum += stock.getQuantity()*stock.getPrice();
+            }
+        }
+        sum = Math.round(sum * 100.0) / 100.0;
+        return sum;
     }
 
     public void sellStock(String name, double quantity) throws IOException, InterruptedException {
@@ -157,6 +174,17 @@ public class Account<E> implements Serializable {
         sum = Math.round(sum * 100.0) / 100.0;
         System.out.println("Total present value = $" + sum);
     }
+    public double getValueBonds() {
+        double sum=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Bonds) {
+                Bonds bond = (Bonds) entry.getValue();
+                sum += bond.getPresentValue();
+            }
+        }
+        sum = Math.round(sum * 100.0) / 100.0;
+        return sum;
+    }
 
     public void sellBond(String name, double quantity) throws IOException, InterruptedException {
         if (portfolio.containsKey(name)) {
@@ -217,6 +245,17 @@ public class Account<E> implements Serializable {
         }
         sum = Math.round(sum * 100.0) / 100.0;
         System.out.println("Total value = $" + sum);
+    }
+    public double getValueCrypto() {
+        double sum=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Crypto) {
+                Crypto crypto = (Crypto) entry.getValue();
+                sum += crypto.getQuantity()*crypto.getPrice();
+            }
+        }
+        sum = Math.round(sum * 100.0) / 100.0;
+        return sum;
     }
 
     public void sellCrypto(String name, double quantity) throws IOException, InterruptedException {
@@ -314,5 +353,30 @@ public class Account<E> implements Serializable {
         System.out.println("________________________________________________________");
         System.out.println("Total Portfolio Value = $" + (sumStock+sumBond+sumCrypto));
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
+    }
+
+    //The graph function was based on code from the developer of xchart
+    //https://stackoverflow.com/questions/13662984/creating-pie-charts-programmatically
+
+    public void holdingsGraph() throws IOException {
+        System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
+        PieChart chart = new PieChartBuilder().width(800).height(600).title("Financial Instruments Graph").theme(Styler.ChartTheme.GGPlot2).build();
+
+        chart.getStyler().setLegendVisible(false);
+        chart.getStyler().setAnnotationType(PieStyler.AnnotationType.LabelAndPercentage);
+        chart.getStyler().setAnnotationDistance(1.15);
+        chart.getStyler().setPlotContentSize(.7);
+        chart.getStyler().setStartAngleInDegrees(90);
+
+        double r = getValueStocks();
+        double g = getValueBonds();
+        double b = getValueCrypto();
+        chart.addSeries("Stocks", r);
+        chart.addSeries("Bonds", g);
+        chart.addSeries("Crypto", b);
+
+        new SwingWrapper(chart).displayChart();
+
+        BitmapEncoder.saveBitmapWithDPI(chart, "./FinancialInstrumentsGraph", BitmapEncoder.BitmapFormat.PNG, 300);
     }
 }
