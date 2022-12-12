@@ -158,7 +158,6 @@ public class Account<E> implements Serializable {
         System.out.println("Total present value = $" + sum);
     }
 
-    // TODO This is what I am changing
     public void sellBond(String name, double quantity) throws IOException, InterruptedException {
         if (portfolio.containsKey(name)) {
             Bonds bond = (Bonds) portfolio.get(name);
@@ -176,6 +175,67 @@ public class Account<E> implements Serializable {
             System.out.println("You do not have that bond.");
         }
     }
+
+    ////////////////// Crypto //////////////////
+    public void addCrypto(String name, double quantity) throws Exception {
+        Crypto temp = new Crypto();
+        double price = temp.buyCrypto(name, quantity);
+        double amount = price * quantity;
+        if (price != 0) {
+            if (this.cash.getBalance() < amount) {
+                System.out.println("You do not have enough money to buy that Crypto.");
+            } else {
+                System.out.println(name + " bought at " + price);
+                this.cash.withdraw(amount);
+                if (portfolio.containsKey(name)) {
+                    Crypto crypto = (Crypto) portfolio.get(name);
+                    crypto.addQuantity(quantity);
+                } else {
+                    Crypto crypto = new Crypto(name, price, quantity);
+                    portfolio.put(name, (E) crypto);
+                }
+            }
+        }
+    }
+
+    public void viewCrypto() {
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Crypto) {
+                Crypto crypto = (Crypto) entry.getValue();
+                System.out.println(crypto.toString());
+            }
+        }
+    }
+    public void valueCrypto() {
+        double sum=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Crypto) {
+                Crypto crypto = (Crypto) entry.getValue();
+                sum += crypto.getQuantity()*crypto.getPrice();
+                System.out.println(crypto.getCryptoname()+": $" + (crypto.getQuantity()*crypto.getPrice()));
+            }
+        }
+        sum = Math.round(sum * 100.0) / 100.0;
+        System.out.println("Total value = $" + sum);
+    }
+
+    public void sellCrypto(String name, double quantity) throws IOException, InterruptedException {
+        if (portfolio.containsKey(name)) {
+            Crypto crypto = (Crypto) portfolio.get(name);
+            if (crypto.getQuantity() < quantity) {
+                System.out.println("You do not have enough crypto to sell that amount.");
+            } else {
+                double price = crypto.sellCrypto(name, quantity);
+                this.cash.deposit(price);
+                if (crypto.getQuantity() == 0) {
+                    portfolio.remove(name);
+                }
+            }
+        } else {
+            System.out.println("You do not have that crypto.");
+        }
+    }
+
 
     ////////////////// PORTFOLIO //////////////////
     public void viewPortfolio() {
@@ -197,6 +257,15 @@ public class Account<E> implements Serializable {
             if (entry.getValue() instanceof Bonds) {
                 Bonds bond = (Bonds) entry.getValue();
                 System.out.println(bond.toString());
+            }
+        }
+
+        System.out.println("________________________________________________________");
+        System.out.println("Current Crypto Holdings: \n");
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Crypto) {
+                Crypto crypto = (Crypto) entry.getValue();
+                System.out.println(crypto.toString());
             }
         }
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
@@ -232,7 +301,18 @@ public class Account<E> implements Serializable {
         sumBond = Math.round(sumBond * 100.0) / 100.0;
         System.out.println("Total Bond Value = $" + sumBond);
         System.out.println("________________________________________________________");
-        System.out.println("Total Portfolio Value = $" + (sumStock+sumBond));
+        double sumCrypto=0;
+        for (Map.Entry<String, E> entry : portfolio.entrySet()) {
+            if (entry.getValue() instanceof Crypto) {
+                Crypto crypto = (Crypto) entry.getValue();
+                sumCrypto += crypto.getQuantity()*crypto.getPrice();
+                System.out.println(crypto.getCryptoname()+": $" + crypto.getQuantity()*crypto.getPrice());
+            }
+        }
+        sumCrypto = Math.round(sumCrypto * 100.0) / 100.0;
+        System.out.println("Total value = $" + sumCrypto);
+        System.out.println("________________________________________________________");
+        System.out.println("Total Portfolio Value = $" + (sumStock+sumBond+sumCrypto));
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
     }
 }

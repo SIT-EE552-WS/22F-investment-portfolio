@@ -41,7 +41,8 @@ public class App {
                     while (true) {
                         System.out.println("1 - Stocks");
                         System.out.println("2 - Bonds");
-                        System.out.println("3 - Main Menu \n");
+                        System.out.println("3 - Crypto");
+                        System.out.println("4 - Main Menu \n");
                         Scanner buy = new Scanner(System.in);
                         int option = buy.nextInt();
 
@@ -56,8 +57,6 @@ public class App {
                             System.out.print("\n");
                             user.addStock(name, quantity);
 
-                            // stock_name.close();
-                            // stock_quantity.close();
                             break;
 
                         } else if (option == 2) {
@@ -91,12 +90,20 @@ public class App {
                                 }
                                 break;
                             }
-                            // bond_value.close();
-                            // bond_name.close();
-                            // bond_quantity.close();
                             break;
 
                         } else if (option == 3) {
+                            System.out.print("Please enter crypto name: ");
+                            Scanner crypto_name = new Scanner(System.in);
+                            String name = crypto_name.nextLine();
+                            System.out.print("\nPlease enter quantity: ");
+                            Scanner crypto_quantity = new Scanner(System.in);
+                            Double quantity = crypto_quantity.nextDouble();
+                            System.out.print("\n");
+                            user.addCrypto(name, quantity);
+
+                            break;
+                        }else if (option == 4) {
                             break;
                         } else {
                             System.out.println("Please pick one of the options.");
@@ -110,7 +117,8 @@ public class App {
                     while (true) {
                         System.out.println("1 - Stocks");
                         System.out.println("2 - Bonds");
-                        System.out.println("3 - Main Menu");
+                        System.out.println("3 - Crypto");
+                        System.out.println("4 - Main Menu");
                         Scanner sell = new Scanner(System.in);
                         int option_sell = sell.nextInt();
 
@@ -128,9 +136,6 @@ public class App {
                             Scanner sell_quantity = new Scanner(System.in);
                             Double quantity = sell_quantity.nextDouble();
                             user.sellStock(name, quantity);
-
-                            // sell_name.close();
-                            // sell_quantity.close();
                             break;
 
                         } else if (option_sell == 2) {
@@ -151,13 +156,27 @@ public class App {
                             break;
 
                         } else if (option_sell == 3) {
+                            //sell crypto
+                            System.out.println("Current crypto: ");
+                            user.viewCrypto();
+                            System.out.println("_________________");
+
+                            System.out.print("Sell - Please enter crypto name: ");
+                            Scanner sell_name = new Scanner(System.in);
+                            String name = sell_name.nextLine();
+
+                            System.out.print("\n Please enter quantity: ");
+                            Scanner sell_quantity = new Scanner(System.in);
+                            Double quantity = sell_quantity.nextDouble();
+                            user.sellCrypto(name, quantity);
+
+                            break;
+                        }else if (option_sell == 4) {
                             break;
                         } else {
                             System.out.println("Please pick one of the options.");
                         }
-                        // sell.close();
                     }
-
                     break;
 
                 case 3:
@@ -165,8 +184,9 @@ public class App {
 
                         System.out.println("1 - Stocks");
                         System.out.println("2 - Bonds");
-                        System.out.println("3 - Portfolio");
-                        System.out.println("4 - Main Menu");
+                        System.out.println("3 - Crypto");
+                        System.out.println("4 - Portfolio");
+                        System.out.println("5 - Main Menu");
 
                         Scanner value = new Scanner(System.in);
                         int option3 = value.nextInt();
@@ -186,13 +206,17 @@ public class App {
                         } else if (option3 == 2) {
                             System.out.println("The present value of your bonds is: ");
                             user.valueBonds();
-
+                            break;
                         } else if (option3 == 3) {
+                            System.out.println("The present value of your crypto is: ");
+                            user.valueCrypto();
+                            break;
+                        } else if (option3 == 4) {
                             // Value of Portfolio
                             System.out.println("Portfolio Value: ");
                             user.valuePortfolio();
-
-                        } else if (option3 == 4) {
+                            break;
+                        } else if (option3 == 5) {
                             break;
                         } else {
                             System.out.println("Please pick one of the options.");
@@ -206,30 +230,35 @@ public class App {
 
                         System.out.println("1 - Stocks");
                         System.out.println("2 - Bonds");
-                        System.out.println("3 - Portfolio");
-                        System.out.println("4 - Main Menu");
+                        System.out.println("3 - Crypto");
+                        System.out.println("4 - Portfolio");
+                        System.out.println("5 - Main Menu");
                         Scanner view = new Scanner(System.in);
                         int option4 = view.nextInt();
 
                         if (option4 == 1) {
                             // View Stocks
-                            System.out.println("Your stocks are the following: ");
+                            System.out.println("You own these stocks: ");
                             user.viewStocks();
                             break;
 
                         } else if (option4 == 2) {
                             // View Bonds
-                            System.out.println("Your bonds are the following: ");
+                            System.out.println("You own these bonds: ");
                             user.viewBonds();
                             break;
 
                         } else if (option4 == 3) {
+                            System.out.println("You own these cryptocurrencies: ");
+                            user.viewCrypto();
+                            break;
+                        } else if (option4 == 4) {
                             // View Portfolio
                             System.out.println("Your Current Portfolio");
                             user.viewPortfolio();
                             break;
 
-                        } else if (option4 == 4) {
+                        } else if (option4 == 5) {
                             break;
 
                         } else {
@@ -272,7 +301,6 @@ public class App {
 
                         } else if (option5 == 3) {
                             break;
-
                         } else {
                             System.out.println("Please pick one of the options.");
                         }
