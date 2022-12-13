@@ -57,6 +57,7 @@ public class App {
                             Scanner stock_quantity = new Scanner(System.in);
                             Double quantity = stock_quantity.nextDouble();
                             System.out.print("\n");
+                            name = name.toUpperCase();
                             user.addStock(name, quantity);
 
                             break;
@@ -70,7 +71,7 @@ public class App {
                                 System.out.print("Please enter bond name: ");
                                 Scanner bond_name_year = new Scanner(System.in);
                                 String name = bond_name_year.nextLine();
-
+                                name = name.toLowerCase();
                                 if ((!"30year".equals(name)) && (!"20year".equals(name)) && (!"10year".equals(name))
                                         && (!"7year".equals(name))
                                         && (!"5year".equals(name)) && (!"3year".equals(name))
@@ -103,6 +104,7 @@ public class App {
                             Scanner crypto_quantity = new Scanner(System.in);
                             Double quantity = crypto_quantity.nextDouble();
                             System.out.print("\n");
+                            name = name.toLowerCase();
                             user.addCrypto(name, quantity);
 
                             break;
