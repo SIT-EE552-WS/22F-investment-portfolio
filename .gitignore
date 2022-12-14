@@ -2,3 +2,5 @@
 src/main/resources/api.properties
 src/main/resources/BondsClassifier.properties
 .vscode
+target
+.idea
