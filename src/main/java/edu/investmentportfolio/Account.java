@@ -32,6 +32,9 @@ public class Account implements Serializable {
         portfolio.put("Cash", this.cash);
     }
 
+    public String getFirstName(){return this.firstName;}
+    public String getLastName(){return this.lastName;}
+
     ////////////////// CASH //////////////////
     public void addCash(double cashAmount) {
         this.cash.deposit(cashAmount);
@@ -56,7 +59,8 @@ public class Account implements Serializable {
             if (this.cash.getBalance() < amount) {
                 System.out.println("You do not have enough money to buy that stock.");
             } else {
-                System.out.println(name + " bought at " + price);
+                System.out.println("Transaction Successful");
+                System.out.println(name + " bought at " + price + " for $" + amount);
                 this.cash.withdraw(amount);
                 if (portfolio.containsKey(name)) {
                     Stock stock = (Stock) portfolio.get(name);
@@ -72,7 +76,7 @@ public class Account implements Serializable {
     public void viewStocks() {
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                System.out.println(stock);
+                System.out.print(stock);
             }
         }
     }
@@ -82,8 +86,9 @@ public class Account implements Serializable {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                sum += stock.getQuantity() * stock.getPrice();
-                System.out.println(stock.getStockName() + ": $" + stock.getQuantity() * stock.getPrice());
+                double value = Math.round((stock.getQuantity() * stock.getPrice()) * 100.0) / 100.0;
+                sum += value;
+                System.out.println(stock.getStockName() + ": $" + value);
             }
         }
         sum = Math.round(sum * 100.0) / 100.0;
@@ -94,7 +99,8 @@ public class Account implements Serializable {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                sum += stock.getQuantity() * stock.getPrice();
+                double value = Math.round((stock.getQuantity() * stock.getPrice()) * 100.0) / 100.0;
+                sum += value;
             }
         }
         sum = Math.round(sum * 100.0) / 100.0;
@@ -102,20 +108,29 @@ public class Account implements Serializable {
     }
 
     public void sellStock(String name, double quantity) throws IOException, InterruptedException {
+        name = name.toUpperCase();
         if (portfolio.containsKey(name)) {
             Stock stock = (Stock) portfolio.get(name);
             if (stock.getQuantity() < quantity) {
                 System.out.println("You do not have enough stock to sell that amount.");
             } else {
                 double price = stock.sellStock(name, quantity);
+                System.out.println("Transaction Successful");
+                System.out.println(name + " gained $" + price + ".");
                 this.cash.deposit(price);
                 if (stock.getQuantity() == 0) {
                     portfolio.remove(name);
+                    System.out.println("No longer have any " + name + " stocks.");
                 }
             }
         } else {
             System.out.println("You do not have that stock.");
         }
+    }
+
+    public void searchStock(String name) throws IOException, InterruptedException {
+        Stock stock = new Stock();
+        stock.viewStock(name);
     }
 
     ////////////////// Bonds //////////////////
@@ -138,7 +153,6 @@ public class Account implements Serializable {
                 if (this.cash.getBalance() < amount) {
                     System.out.println("You do not have enough money to buy that bond.");
                 } else {
-                    System.out.println( name + "year bought at " + faceValue);
                     this.cash.withdraw(amount);
                     //now here
                     name = name +"year";
@@ -150,6 +164,7 @@ public class Account implements Serializable {
                         Bonds bond = new Bonds(name, faceValue, quantity, couRate, yieldVal, expMonth, expYear);
                         portfolio.put(name, bond);
                     }
+                    System.out.println("Transaction Successful");
                 }
             }
         } else {
@@ -160,7 +175,7 @@ public class Account implements Serializable {
     public void viewBonds() {
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Bonds bond) {
-                System.out.println(bond);
+                System.out.print(bond);
             }
         }
     }
@@ -190,16 +205,18 @@ public class Account implements Serializable {
     }
 
     public void sellBond(String name, double quantity) {
-        name = name+"year";
+        name = name + "year";
         if (portfolio.containsKey(name)) {
             Bonds bond = (Bonds) portfolio.get(name);
             if (bond.getQuantity() < quantity) {
                 System.out.println("You do not have enough bonds to sell that amount.");
             } else {
+                System.out.println("Transaction Successful");
                 double price = bond.sellBonds(quantity);
                 this.cash.deposit(price);
                 if (bond.getQuantity() == 0) {
                     portfolio.remove(name);
+                    System.out.println("No longer have a " + name + " bond.");
                 }
             }
         } else {
@@ -217,7 +234,8 @@ public class Account implements Serializable {
             if (this.cash.getBalance() < amount) {
                 System.out.println("You do not have enough money to buy that Crypto.");
             } else {
-                System.out.println(name + " bought at " + price);
+                System.out.println("Transaction Successful");
+                System.out.println(name + " bought at " + price + " for $" + amount);
                 this.cash.withdraw(amount);
                 if (portfolio.containsKey(name)) {
                     Crypto crypto = (Crypto) portfolio.get(name);
@@ -233,18 +251,18 @@ public class Account implements Serializable {
     public void viewCrypto() {
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                System.out.println(crypto);
+                System.out.print(crypto);
             }
         }
     }
-
 
     public void valueCrypto() {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                sum += crypto.getQuantity() * crypto.getPrice();
-                System.out.println(crypto.getCryptoName()+": $" + (crypto.getQuantity()*crypto.getPrice()));
+                double value = Math.round((crypto.getQuantity()*crypto.getPrice()) * 100.0) / 100.0;
+                sum += value;
+                System.out.println(crypto.getCryptoName()+": $" + value);
             }
         }
         sum = Math.round(sum * 100.0) / 100.0;
@@ -256,7 +274,8 @@ public class Account implements Serializable {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                sum += crypto.getQuantity()*crypto.getPrice();
+                double value = Math.round((crypto.getQuantity()*crypto.getPrice()) * 100.0) / 100.0;
+                sum += value;
             }
         }
         sum = Math.round(sum * 100.0) / 100.0;
@@ -264,16 +283,18 @@ public class Account implements Serializable {
     }
 
     public void sellCrypto(String name, double quantity) throws IOException, InterruptedException {
-        name = name + "year";
         if (portfolio.containsKey(name)) {
             Crypto crypto = (Crypto) portfolio.get(name);
             if (crypto.getQuantity() < quantity) {
                 System.out.println("You do not have enough crypto to sell that amount.");
             } else {
+                System.out.println("Transaction Successful");
                 double price = crypto.sellCrypto(name, quantity);
+                System.out.println(name + " gained $" + price + ".");
                 this.cash.deposit(price);
                 if (crypto.getQuantity() == 0) {
                     portfolio.remove(name);
+                    System.out.println("No longer have any " + name + " crypto.");
                 }
             }
         } else {
@@ -281,15 +302,19 @@ public class Account implements Serializable {
         }
     }
 
+    public void searchCrypto(String name) throws IOException, InterruptedException {
+        Crypto crypto = new Crypto();
+        crypto.viewCrypto(name);
+    }
 
     ////////////////// PORTFOLIO //////////////////
     private void headerAccount() {
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
-        System.out.println("Account Holder: " + this.firstName + " " + this.lastName + "\n");
-        System.out.println("Cash Balance: " + this.cash.getBalance() + "\n");
+        System.out.print("Account Holder: " + this.firstName + " " + this.lastName + "\n");
+        System.out.print("Cash Balance: " + this.cash.getBalance() + "\n");
 
         System.out.println("________________________________________________________");
-        System.out.println("Current Stock Holdings: \n");
+        System.out.print("Current Stock Holdings: \n\n");
     }
 
     public void viewPortfolio() {
@@ -301,18 +326,14 @@ public class Account implements Serializable {
             }
         }
         System.out.println("________________________________________________________");
-
-
-        System.out.println("Current Bond Holdings: \n");
+        System.out.print("Current Bond Holdings: \n\n");
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Bonds bond) {
                 System.out.println(bond);
             }
         }
         System.out.println("________________________________________________________");
-
-
-        System.out.println("Current Crypto Holdings: \n");
+        System.out.print("Current Crypto Holdings: \n\n");
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
                 System.out.println(crypto);
@@ -328,16 +349,20 @@ public class Account implements Serializable {
         double sumStock = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                sumStock += stock.getQuantity() * stock.getPrice();
-                System.out.println(stock.getStockName()+": $" + stock.getQuantity() * stock.getPrice());
+                double value = Math.round((stock.getQuantity() * stock.getPrice()) * 100.0) / 100.0;
+                sumStock += value;
+                System.out.println(stock.getStockName()+": $" + value);
             }
+        }
+        if(sumStock == 0){
+            System.out.println("No current stocks on profile.");
         }
         sumStock = Math.round(sumStock * 100.0) / 100.0;
         System.out.println("Total Stock Value = $" + sumStock);
         System.out.println("________________________________________________________");
 
 
-        System.out.println("Current Bond Holdings: \n");
+        System.out.print("Current Bond Holdings: \n\n");
         double sumBond = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Bonds bond) {
@@ -345,22 +370,34 @@ public class Account implements Serializable {
                 System.out.println(bond.getBondSymbol()+": $" + bond.getPresentValue() );
             }
         }
+        if(sumBond == 0){
+            System.out.println("No current bonds on profile.");
+        }
         sumBond = Math.round(sumBond * 100.0) / 100.0;
         System.out.println("Total Bond Value = $" + sumBond);
         System.out.println("________________________________________________________");
 
+
+        System.out.print("Current Crypto Holdings: \n\n");
         double sumCrypto = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                sumCrypto += crypto.getQuantity()*crypto.getPrice();
-                System.out.println(crypto.getCryptoName()+": $" + crypto.getQuantity() * crypto.getPrice());
+                double value = Math.round((crypto.getQuantity()*crypto.getPrice()) * 100.0) / 100.0;
+                sumCrypto += value;
+                System.out.println(crypto.getCryptoName()+": $" + value);
             }
         }
+
+        if(sumCrypto == 0){
+            System.out.println("No current cryptos on profile.");
+        }
+
         sumCrypto = Math.round(sumCrypto * 100.0) / 100.0;
         System.out.println("Total value = $" + sumCrypto);
         System.out.println("________________________________________________________");
 
-        System.out.println("Total Portfolio Value = $" + (sumStock+sumBond+sumCrypto));
+        double total = sumStock + sumBond + sumCrypto;
+        System.out.println("Total Portfolio Value = $" + (Math.round(total * 100.0) / 100.0));
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
     }
 

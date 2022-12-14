@@ -58,31 +58,31 @@ public class Crypto implements Serializable, Instrument{
         return setPriceCrypto(cryptoPrice);
     }
 
-    //method to view crypto
-    public String viewCrypto(String name) throws IOException, InterruptedException {
+    //method to help display search for crypto
+    public void viewCrypto(String name) throws IOException, InterruptedException {
         double cryptoPrice = getCryptoPrice(name);
         if (cryptoPrice == 0) {
-            return "Invalid stock name.";
+            System.out.print("Invalid crypto name.\n");
+        } else {
+            cryptoPrice = setPriceCrypto(cryptoPrice);
+            System.out.print("Crypto Name: " + name + ", Price: " + cryptoPrice + "\n");
         }
-
-        cryptoPrice = setPriceCrypto(cryptoPrice);
-        return "Crypto Name: " + name + ", Price: " + cryptoPrice + "\n";
     }
 
     //method to sell crypto
     public double sellCrypto(String name, double cryptoQuantity) throws IOException, InterruptedException {
-        double cryptoPrice = buyCrypto(name);
-        if (cryptoQuantity < this.quantity) {
+        double cryptoPrice = getCryptoPrice(name);
+        if (cryptoQuantity <= this.quantity) {
             this.quantity -= cryptoQuantity;
             cryptoPrice = Math.round(cryptoPrice * 100.0) / 100.0;
-            return cryptoPrice * cryptoQuantity;
+            return setPriceCrypto(cryptoPrice * cryptoQuantity);
         }
         return 0;
     }
 
     @Override
     public String toString() {
-        return "Crypto Name: " + cryptoName + ", Quantity: " + quantity + ", Price: " + price + "\n";
+        return "Crypto Name: " + this.cryptoName + ", Quantity: " + this.quantity + ", Price: " + this.price + "\n";
     }
 
     public void addQuantity(double quantity2) {

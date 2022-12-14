@@ -59,21 +59,22 @@ public class Stock implements Serializable, Instrument {
         return setPriceStock(stockPrice);
     }
 
-    // method to view a stock
-    public String viewStock(String name) throws IOException, InterruptedException {
+    // method to help display search for a stock
+    public void viewStock(String name) throws IOException, InterruptedException {
         double stockPrice = getStockPrice(name);
 
         if (stockPrice == 0) {
-            return "Invalid stock name.";
+            System.out.print("Invalid stock name.\n");
+        } else{
+            stockPrice = setPriceStock(stockPrice);
+            System.out.print("Stock Name: " + name + ", Price: " + stockPrice + "\n");
         }
-        stockPrice = setPriceStock(stockPrice);
-        return "Stock Name: " + name + ", Price: " + stockPrice + "\n";
     }
 
     // method to sell a stock
     public double sellStock(String name, double stockQuantity) throws IOException, InterruptedException {
         double stockPrice = getStockPrice(name);
-        if (stockQuantity < this.quantity) {
+        if (stockQuantity <= this.quantity) {
             this.quantity -= stockQuantity;
             stockPrice = Math.round(stockPrice * 100.0) / 100.0;
             return stockPrice * stockQuantity;

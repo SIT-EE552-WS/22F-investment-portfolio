@@ -59,16 +59,10 @@ public class Bonds implements Serializable, Instrument {
         return new JSONArray(response.body());
     }
 
-    // method to buy a bond
-    public double buyBond(String name) throws IOException, InterruptedException {
-        JSONArray obj = getJsonArrayBond(name);
-        return Double.parseDouble(obj.getJSONObject(0).getString("pricePer100"));
-    }
-
     //method to sell a bond
     public double sellBonds(double bondQuantity) {
         double sellPrice = setValue(this.faceValue);
-        if (bondQuantity < this.quantity) {
+        if (bondQuantity <= this.quantity) {
             this.quantity -= bondQuantity;
             sellPrice = setValue(sellPrice);
             return sellPrice * bondQuantity;
@@ -76,7 +70,7 @@ public class Bonds implements Serializable, Instrument {
         return 0;
     }
 
-    //method to get a bond's information
+    //method to set/buy a bond's information
     public static double getBondInfo(String name, int numChoice) throws IOException, InterruptedException {
         JSONArray obj = getJsonArrayBond(name);
         double getBondYield;

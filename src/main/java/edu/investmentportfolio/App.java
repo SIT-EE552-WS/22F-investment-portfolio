@@ -1,6 +1,6 @@
 package edu.investmentportfolio;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 /**
@@ -14,7 +14,47 @@ public class App {
     static Scanner cashInput = new Scanner(System.in);
     static Scanner sellInput = new Scanner(System.in);
     static Scanner buyInput = new Scanner(System.in);
+    static Scanner searchInput = new Scanner(System.in);
 
+    public static void save(Account user) throws IOException{
+        String name = user.getFirstName().toLowerCase() + "_" + user.getLastName().toLowerCase();
+        try (
+                FileOutputStream fos = new FileOutputStream("existingAccounts/" + name + ".ser");
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+                ){
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
+    }
+
+    public static Account check(String firstName, String lastName) throws IOException, ClassNotFoundException{
+        String name = firstName.toLowerCase() + "_" + lastName.toLowerCase();
+        File user = new File("existingAccounts/" + name + ".ser");
+
+        if (user.exists()){
+            try (
+                    FileInputStream fis = new FileInputStream(user);
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ){
+                Object o = ois.readObject();
+                if(o instanceof Account account){
+                    System.out.print("\nWelcome back: " + account.getFirstName() + " " + account.getLastName());
+                    return account;
+                }
+            } catch (IOException e) {
+                throw new IOException(e);
+            } catch (ClassNotFoundException i) {
+                throw new ClassNotFoundException();
+            }
+        }
+
+        System.out.print("\nWelcome to your new account: " + firstName + " " + lastName);
+        System.out.print("\nWhat is your starting balance for investment? ");
+        double startingBalance = Double.parseDouble(userInput.nextLine());
+
+        return new Account(firstName, lastName, startingBalance);
+    }
 
     public static void main(String[] args) throws Exception {
         System.out.println("Investment Portfolio Simulator");
@@ -22,13 +62,10 @@ public class App {
         System.out.print("What is your first name? ");
         String firstName = userInput.nextLine();
 
-        System.out.print("\nWhat is your last name? ");
+        System.out.print("What is your last name? ");
         String lastName = userInput.nextLine();
 
-        System.out.print("\nWhat is your starting balance for investment? ");
-        double startingBalance = userInput.nextDouble();
-
-        Account user = new Account(firstName, lastName, startingBalance);
+        Account user = check(firstName, lastName);
 
         boolean running = true;
 
@@ -38,6 +75,7 @@ public class App {
             int input = userInput.nextInt();
 
             switch (input) {
+                case 0 -> search(user);
                 case 1 -> buy(user);
                 case 2 -> sell(user);
                 case 3 -> value(user);
@@ -57,30 +95,52 @@ public class App {
         buyInput.close();
         sellInput.close();
         cashInput.close();
+        searchInput.close();
+        save(user);
+        System.out.print("\nPortfolio Saved. Until next time!\n");
+        System.exit(0);
     }
 
-    private static void cash(Account user) {
-        while (true) {
-            System.out.println("1 - Withdraw");
-            System.out.println("2 - Deposit");
-            System.out.println("3 - Main Menu");
-            int option5 = userInput.nextInt();
+    // method to display main menu.
+    private static void mainMenu() {
+        System.out.println("\n0 - Search");
+        System.out.println("1 - Buy");
+        System.out.println("2 - Sell");
+        System.out.println("3 - Value");
+        System.out.println("4 - View");
+        System.out.println("5 - Cash");
+        System.out.println("6 - Graph");
+        System.out.println("7 - Exit \n");
 
-            switch(option5){
+    }
+
+    private static void search(Account user) throws IOException, InterruptedException {
+        while (true) {
+            System.out.println("1 - Stock");
+            System.out.println("2 - Crypto");
+            System.out.println("3 - Main Menu \n");
+
+            int option = userInput.nextInt();
+
+            switch (option) {
                 case 1:
-                    // Withdraw
-                    System.out.println("How much would you like to withdraw?");
-                    double option5Withdraw = Double.parseDouble(cashInput.nextLine());
-                    user.withdrawCash(option5Withdraw);
-                    user.viewBalance();
+                    // search Stock
+                    System.out.print("Please enter stock name: ");
+                    String stockName = searchInput.nextLine();
+
+                    System.out.print("\n");
+                    stockName = stockName.toUpperCase();
+                    user.searchStock(stockName);
                     break;
 
                 case 2:
-                    // Deposit
-                    System.out.println("How much would you like to deposit?");
-                    double option5Deposit = Double.parseDouble(cashInput.nextLine());
-                    user.addCash(option5Deposit);
-                    user.viewBalance();
+                    //Buy Crypto
+                    System.out.print("Please enter crypto name: ");
+                    String cryptoName = searchInput.nextLine();
+
+                    System.out.print("\n");
+                    cryptoName = cryptoName.toLowerCase();
+                    user.searchCrypto(cryptoName);
                     break;
 
                 case 3:
@@ -90,61 +150,159 @@ public class App {
                     System.out.println("Please pick one of the options.");
             }
 
-            if(option5 == 1 || option5 == 2 || option5 == 3){
+            if (option == 1 || option == 2 || option == 3) {
                 break;
             }
         }
     }
 
-    private static void view(Account user) {
-        while (true) {
 
+    // method for handling the buy selection.
+    private static void buy(Account user) throws IOException, InterruptedException {
+        while (true) {
             System.out.println("1 - Stocks");
             System.out.println("2 - Bonds");
             System.out.println("3 - Crypto");
-            System.out.println("4 - Portfolio");
-            System.out.println("5 - Main Menu");
+            System.out.println("4 - Main Menu \n");
 
-            int option4 = userInput.nextInt();
+            int option = userInput.nextInt();
 
-            switch(option4){
+            switch(option){
                 case 1:
-                    // View Stocks
-                    System.out.println("You own these stocks: ");
-                    user.viewStocks();
+                    // Buy Stock
+                    System.out.print("Please enter stock name: ");
+                    String stockName = buyInput.nextLine();
+
+                    System.out.print("Please enter quantity: ");
+                    double stockQuantity =  Double.parseDouble(buyInput.nextLine());
+
+                    System.out.print("\n");
+                    stockName = stockName.toUpperCase();
+                    user.addStock(stockName, stockQuantity);
                     break;
 
                 case 2:
-                    // View Bonds
-                    System.out.println("You own these bonds: ");
-                    user.viewBonds();
+                    // Buy Bond
+                    System.out.println("We offer a variety of multiyear bonds:");
+                    System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year\n");
+
+                    System.out.print("Please select a bond year: ");
+                    String bondName = buyInput.nextLine();
+
+                    if (Bonds.setYear(bondName) == 0) {
+                        System.out.println("We do not offer that type of bond.");
+                        break;
+                    }
+
+                    System.out.print("Please enter denomination: ");
+                    double denomination = Double.parseDouble(buyInput.nextLine());
+
+                    System.out.print("Please enter quantity: ");
+                    double quantity = Double.parseDouble(buyInput.nextLine());
+
+                    System.out.print("\n");
+                    user.addBond(bondName, denomination, quantity);
                     break;
 
                 case 3:
-                    // View Crypto
-                    System.out.println("You own these cryptocurrencies: ");
-                    user.viewCrypto();
+                    //Buy Crypto
+                    System.out.print("Please enter crypto name: ");
+                    String cryptoName = buyInput.nextLine();
+
+                    System.out.print("Please enter quantity: ");
+                    double cryptoQuantity = Double.parseDouble(buyInput.nextLine());
+
+                    System.out.print("\n");
+                    cryptoName = cryptoName.toLowerCase();
+                    user.addCrypto(cryptoName, cryptoQuantity);
                     break;
 
                 case 4:
-                    // View Portfolio
-                    System.out.println("Your Current Portfolio");
-                    user.viewPortfolio();
-                    break;
-
-                case 5:
                     break;
 
                 default:
                     System.out.println("Please pick one of the options.");
             }
 
-            if(option4 == 1 || option4 == 2 || option4 == 3 || option4 == 4 || option4 == 5){
+            if(option == 1 || option == 2 || option == 3 || option == 4) {
                 break;
             }
         }
     }
 
+    // method for handling the sell selection.
+    private static void sell(Account user) throws IOException, InterruptedException {
+
+        while (true) {
+            System.out.println("1 - Stocks");
+            System.out.println("2 - Bonds");
+            System.out.println("3 - Crypto");
+            System.out.println("4 - Main Menu");
+            int option = userInput.nextInt();
+
+            switch(option){
+                case 1:
+                    // sell stock
+                    System.out.println("Current stocks: \n");
+                    user.viewStocks();
+                    System.out.println("_________________");
+
+                    System.out.print("Please enter stock name: ");
+                    String stockName = sellInput.nextLine();
+
+                    System.out.print("Please enter quantity: ");
+                    double stockQuantity = Double.parseDouble(sellInput.nextLine());
+
+                    System.out.print("\n");
+                    user.sellStock(stockName, stockQuantity);
+                    break;
+
+                case 2:
+                    // sell bond
+                    System.out.println("Current bonds: \n");
+                    user.viewBonds();
+                    System.out.println("_________________");
+
+                    System.out.print("Please enter bond name: ");
+                    String bondName = sellInput.nextLine();
+
+                    System.out.print("Please enter quantity: ");
+                    double bondQuantity = Double.parseDouble(sellInput.nextLine());
+
+                    System.out.print("\n");
+                    user.sellBond(bondName, bondQuantity);
+                    break;
+
+                case 3:
+                    //sell crypto
+                    System.out.println("Current crypto: \n");
+                    user.viewCrypto();
+                    System.out.println("_________________");
+
+                    System.out.print("Please enter crypto name: ");
+                    String cryptoName = sellInput.nextLine();
+
+                    System.out.print("Please enter quantity: ");
+                    double cryptoQuantity = Double.parseDouble(sellInput.nextLine());
+
+                    System.out.print("\n");
+                    user.sellCrypto(cryptoName, cryptoQuantity);
+                    break;
+
+                case 4:
+                    break;
+
+                default:
+                    System.out.println("Please pick one of the options.");
+            }
+
+            if(option == 1 || option == 2 || option == 3 || option == 4 || option == 5){
+                break;
+            }
+        }
+    }
+
+    // method for handling the value selection.
     private static void value(Account user) {
         while (true) {
 
@@ -154,9 +312,9 @@ public class App {
             System.out.println("4 - Portfolio");
             System.out.println("5 - Main Menu");
 
-            int option3 = userInput.nextInt();
+            int option = userInput.nextInt();
 
-            switch(option3){
+            switch(option){
                 case 1:
                     // Value of Stocks
                     System.out.println("The value of your stocks is: ");
@@ -187,156 +345,100 @@ public class App {
                 default:
                     System.out.println("Please pick one of the options.");
             }
-            if(option3 == 1 || option3 == 2 || option3 == 3 || option3 == 4 || option3 == 5){
+            if(option == 1 || option == 2 || option == 3 || option == 4 || option == 5){
                 break;
             }
         }
     }
 
-    private static void sell(Account user) throws IOException, InterruptedException {
-
+    // method for handling the view selection.
+    private static void view(Account user) {
         while (true) {
+
             System.out.println("1 - Stocks");
             System.out.println("2 - Bonds");
             System.out.println("3 - Crypto");
-            System.out.println("4 - Main Menu");
-            int option2 = userInput.nextInt();
+            System.out.println("4 - Portfolio");
+            System.out.println("5 - Main Menu");
 
-            switch(option2){
+            int option = userInput.nextInt();
+
+            switch(option){
                 case 1:
-                    // sell stock
-                    System.out.println("Current stocks: ");
+                    // View Stocks
+                    System.out.println("You own these stocks: ");
                     user.viewStocks();
-                    System.out.println("_________________");
-
-                    System.out.print("Sell - Please enter stock name: ");
-                    String stockName = sellInput.nextLine();
-
-                    System.out.print("\n Please enter quantity: ");
-                    double stockQuantity = Double.parseDouble(sellInput.nextLine());
-                    user.sellStock(stockName, stockQuantity);
                     break;
 
                 case 2:
-                    // sell bond
-                    System.out.println("Current bonds: ");
+                    // View Bonds
+                    System.out.println("You own these bonds: ");
                     user.viewBonds();
-                    System.out.println("_________________");
-
-                    System.out.print("Please enter bond name: ");
-                    String bondName = sellInput.nextLine();
-
-                    System.out.print("\n Please enter quantity: ");
-                    double bondQuantity = Double.parseDouble(sellInput.nextLine());
-                    user.sellBond(bondName, bondQuantity);
                     break;
 
                 case 3:
-                    //sell crypto
-                    System.out.println("Current crypto: ");
+                    // View Crypto
+                    System.out.println("You own these cryptocurrencies: ");
                     user.viewCrypto();
-                    System.out.println("_________________");
-
-                    System.out.print("Sell - Please enter crypto name: ");
-                    String cryptoName = sellInput.nextLine();
-
-                    System.out.print("\n Please enter quantity: ");
-                    double cryptoQuantity = Double.parseDouble(sellInput.nextLine());
-                    user.sellCrypto(cryptoName, cryptoQuantity);
                     break;
 
                 case 4:
+                    // View Portfolio
+                    System.out.println("Your Current Portfolio: ");
+                    user.viewPortfolio();
+                    break;
+
+                case 5:
                     break;
 
                 default:
                     System.out.println("Please pick one of the options.");
             }
 
-            if(option2 == 1 || option2 == 2 || option2 == 3 || option2 == 4 || option2 == 5){
+            if(option == 1 || option == 2 || option == 3 || option == 4 || option == 5){
                 break;
             }
         }
     }
 
-    private static void buy(Account user) throws IOException, InterruptedException {
+    // method for handling the cash selection.
+    private static void cash(Account user) {
         while (true) {
-            System.out.println("1 - Stocks");
-            System.out.println("2 - Bonds");
-            System.out.println("3 - Crypto");
-            System.out.println("4 - Main Menu \n");
+            System.out.println("1 - Withdraw");
+            System.out.println("2 - Deposit");
+            System.out.println("3 - Main Menu");
+            int option = userInput.nextInt();
 
-            int option1 = userInput.nextInt();
-
-            switch(option1){
+            switch(option){
                 case 1:
-                    // Buy Stock
-                    System.out.print("Please enter stock name: ");
-                    String stockName = buyInput.nextLine();
-
-                    System.out.print("\nPlease enter quantity: ");
-                    double stockQuantity =  Double.parseDouble(buyInput.nextLine());
-
-                    System.out.print("\n");
-                    stockName = stockName.toUpperCase();
-                    user.addStock(stockName, stockQuantity);
+                    // Withdraw
+                    System.out.print("How much would you like to withdraw? ");
+                    double withDraw = Double.parseDouble(cashInput.nextLine());
+                    System.out.print("\nBalance: ");
+                    user.withdrawCash(withDraw);
+                    user.viewBalance();
                     break;
 
                 case 2:
-                    // Buy Bond
-                    System.out.println("We offer a variety of multiyear bonds:");
-                    System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year\n");
+                    // Deposit
+                    System.out.print("How much would you like to deposit? ");
+                    double dePosit = Double.parseDouble(cashInput.nextLine());
+                    user.addCash(dePosit);
 
-                    System.out.print("Please select a bond year: ");
-                    String bondName = buyInput.nextLine();
-
-                    if (Bonds.setYear(bondName) == 0) {
-                        System.out.println("We do not offer that type of bond.");
-                        break;
-                    }
-
-                    System.out.print("\n Please enter denomination: ");
-                    double denomination = Double.parseDouble(buyInput.nextLine());
-
-                    System.out.print("\n Please enter quantity: ");
-                    double quantity = Double.parseDouble(buyInput.nextLine());
-
-                    user.addBond(bondName, denomination, quantity);
+                    System.out.print("\nBalance: ");
+                    user.viewBalance();
                     break;
 
                 case 3:
-                    //Buy Crypto
-                    System.out.print("Please enter crypto name: ");
-                    String cryptoName = buyInput.nextLine();
-
-                    System.out.print("\nPlease enter quantity: ");
-                    double cryptoQuantity = Double.parseDouble(buyInput.nextLine());
-
-                    System.out.print("\n");
-                    cryptoName = cryptoName.toLowerCase();
-                    user.addCrypto(cryptoName, cryptoQuantity);
-                    break;
-
-                case 4:
                     break;
 
                 default:
                     System.out.println("Please pick one of the options.");
             }
 
-            if(option1 == 1 || option1 == 2 || option1 == 3 || option1 == 4) {
+            if(option == 1 || option == 2 || option == 3){
                 break;
             }
         }
-    }
-
-    private static void mainMenu() {
-        System.out.println("\n1 - Buy");
-        System.out.println("2 - Sell");
-        System.out.println("3 - Value");
-        System.out.println("4 - View");
-        System.out.println("5 - Cash");
-        System.out.println("6 - Graph");
-        System.out.println("7 - Exit \n");
-
     }
 }
