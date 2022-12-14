@@ -1,11 +1,8 @@
 package edu.investmentportfolio;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,58 +11,36 @@ import java.net.http.HttpResponse;
 import java.util.Properties;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import javax.swing.plaf.synth.SynthToggleButtonUI;
-
-//Bond/fixed income (price, coupon, yield, expdate)
+// Bond/fixed income (price, coupon, yield, expDate)
 // yield is the same as coupon rate
 
-public class Bonds implements Serializable {
+@SuppressWarnings("SpellCheckingInspection")
+public class Bonds implements Serializable, Instrument {
+    @Serial
     private static final long serialVersionUID = 4L;
-    private String bondSymbol;
-    private double faceValue;
+    private final String bondSymbol;
+    private final double faceValue;
     private double quantity;
-    private double couponRate;
-    private double yield;
-    private int expMonth;
-    private int expYear;
-    public Bonds() {
-    }
+    private final double couponRate;
+    private final double bondYield;
+    private final int expMonth;
+    private final int expYear;
 
-    public Bonds(String bondSymbol, double faceValue, double quantity,
-                 double couponRate, double yield, int expMonth, int expYear) {
+    public Bonds(
+            String bondSymbol, double faceValue, double quantity,
+            double couponRate, double bondYield, int expMonth, int expYear) {
         this.bondSymbol = bondSymbol;
         this.faceValue = faceValue;
         this.quantity = quantity;
         this.couponRate = couponRate;
         this.expMonth = expMonth;
         this.expYear = expYear;
-        this.yield = yield;
+        this.bondYield = bondYield;
     }
 
-    public double getFaceValue() {
-        return this.faceValue;
-    }
-    public String getBondSymbol() {
-        return this.bondSymbol;
-    }
-
-    public double getYield() {
-        return this.yield;
-    }
-
-    public double getExpMonth() {
-        return this.expMonth;
-    }
-
-    public double getExpYear() {
-        return this.expYear;
-    }
-
-    // Like Stocks this is just getting the sell price
-
-    public double buyBonds(String name, double faceValue, double quantity) throws IOException, InterruptedException {
+    //method to make the http call
+    private static JSONArray getJsonArrayBond(String name) throws IOException, InterruptedException {
         Properties props = new Properties();
         InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("BondsClassifier.properties");
         if (inputStream != null) {
@@ -81,122 +56,104 @@ public class Bonds implements Serializable {
                         "https://www.treasurydirect.gov/TA_WS/securities/search?cusip=" + cusip + "&format=json"))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONArray obj = new JSONArray(response.body());
-        double price = Double.parseDouble(obj.getJSONObject(0).getString("pricePer100"));
-        System.out.println(combine + " / " + price);
-        if (price != 0) {
-            return price;
+        return new JSONArray(response.body());
+    }
+
+    // method to buy a bond
+    public double buyBond(String name) throws IOException, InterruptedException {
+        JSONArray obj = getJsonArrayBond(name);
+        return Double.parseDouble(obj.getJSONObject(0).getString("pricePer100"));
+    }
+
+    //method to sell a bond
+    public double sellBonds(double bondQuantity) {
+        double sellPrice = setValue(this.faceValue);
+        if (bondQuantity < this.quantity) {
+            this.quantity -= bondQuantity;
+            sellPrice = setValue(sellPrice);
+            return sellPrice * bondQuantity;
+        }
+        return 0;
+    }
+
+    //method to get a bond's information
+    public static double getBondInfo(String name, int numChoice) throws IOException, InterruptedException {
+        JSONArray obj = getJsonArrayBond(name);
+        double getBondYield;
+        String avgMedYield = "averageMedianYield";
+        if ("".equals(obj.getJSONObject(0).getString(avgMedYield))){
+            getBondYield = Double.parseDouble(obj.getJSONObject(1).getString(avgMedYield));
+
         } else {
-            System.out.println("Invalid bond name.");
-            return 0;
+            getBondYield = Double.parseDouble(obj.getJSONObject(0).getString(avgMedYield));
         }
-    }
 
-    public static double getBondInfo(String name, double faceValue, double quantity, int numChoice) throws IOException, InterruptedException {
-        Properties props = new Properties();
-        InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("BondsClassifier.properties");
-        if (inputStream != null) {
-            props.load(inputStream);
-        }
-        int num = setYear(name);
-        String combine = "cusip" + num;
-        String cusip = props.getProperty(combine);
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(
-                        "https://www.treasurydirect.gov/TA_WS/securities/search?cusip=" + cusip + "&format=json"))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONArray obj = new JSONArray(response.body());
-        double yield;
-        if ("".equals(obj.getJSONObject(0).getString("averageMedianYield"))){
-            yield = Double.parseDouble(obj.getJSONObject(1).getString("averageMedianYield"));
-        }else{
-            yield = Double.parseDouble(obj.getJSONObject(0).getString("averageMedianYield"));
-        }
         double couRate = Double.parseDouble(obj.getJSONObject(0).getString("interestRate"));
 
-        switch(numChoice){
-            case 1:
-                if (yield != 0) {
-                    return yield;
-                } else {
-                    System.out.println("YIELD NOT FOUND");
-                    return 0;
-                }
-            case 2:
-                if (couRate != 0) {
-                    return couRate;
-                } else {
-                    System.out.println("COUPON RATE NOT FOUND");
-                    return 0;
-                }
-            default:
-                return 0;
-        }
+        return switch (numChoice) {
+            case 1 -> getBondYield;
+            case 2 -> couRate;
+            default -> 0;
+        };
     }
+
+    public double getPresentValue() {
+        // Formula taken from https://www.wallstreetmojo.com/bond-pricing-formula/
+        double n = 2; //treasury bonds are semi-annual
+        int t = expYear - 2022;
+        double ytm = 0.0377; // This value (3.77%) was taken from averaging multiple YTMs for different bonds using data from https://ycharts.com/indicators
+        // (ex. YTM for a 7-year bond is 3.69 from https://ycharts.com/indicators/7_year_treasury_rate )
+        double newCouponRate = couponRate/100;
+
+        double valueFromInterest = ( 1 - Math.pow( ( 1 + (ytm / n) ),( -n * t ))) / (ytm / n);
+        double valueFromRedemption = faceValue / Math.pow( ( 1 + (ytm / 2)),( n * t));
+        double coupon = ( faceValue * ( newCouponRate ) ) / n;
+        double pv = coupon * valueFromInterest + valueFromRedemption;
+
+        return setValue(pv * quantity);
+    }
+
     public static int setYear(String name){
 
-        if ("30year".equals(name)) {
+        if ("30".equals(name)) {
             return 30;
-        } else if ("20year".equals(name)) {
+        } else if ("20".equals(name)) {
             return 20;
-        } else if ("10year".equals(name)) {
+        } else if ("10".equals(name)) {
             return 10;
-        } else if ("7year".equals(name)) {
+        } else if ("7".equals(name)) {
             return 7;
-        } else if ("5year".equals(name)) {
+        } else if ("5".equals(name)) {
             return 5;
-        } else if ("3year".equals(name)) {
+        } else if ("3".equals(name)) {
             return 3;
-        } else if ("2year".equals(name)) {
+        } else if ("2".equals(name)) {
             return 2;
         } else {
             return 0;
         }
     }
-
-    @Override
-    public String toString() {
-        return "Bond Name: " + bondSymbol + ", Face Value: " + faceValue
-                + ", Coupon Rate: " + couponRate
-                + ", Quantity: " + quantity + ", Yield: " + yield
-                + ", Expiration Date: " + expMonth + "/" + expYear + "\n";
-    }
-
-    public void addQuantity(double quantity2) {
-        this.quantity += quantity2;
+    public void addQuantity(double newQuantity) {
+        this.quantity += newQuantity;
     }
 
     public double getQuantity() {
-        return quantity;
+        return this.quantity;
     }
 
-    public double sellBonds(String name, double quantity2) throws IOException, InterruptedException {
-        double sellPrice = faceValue;
-        if (quantity2 > this.quantity) {
-            System.out.println("You do not have enough bonds to sell that amount.");
-            return 0;
-        } else {
-            this.quantity -= quantity2;
-            sellPrice = Math.round(sellPrice * 100.0) / 100.0;
-            return sellPrice * quantity2;
-        }
+    public String getBondSymbol() {
+        return this.bondSymbol;
     }
-    public double getPresentValue() {
-        // Formula taken from https://www.wallstreetmojo.com/bond-pricing-formula/
-        double n = 2; //treasury bonds are semi-annual
-        double t = expYear - 2022;
-        double YTM = 0.0377; // This value (3.77%) was taken from averaging multiple YTMs for different bonds using data from https://ycharts.com/indicators
-        // (ex. YTM for a 7-year bond is 3.69 from https://ycharts.com/indicators/7_year_treasury_rate )
-        double newCouponRate = couponRate/100;
 
-        double valueFromInterest = (1-Math.pow((1+(YTM/n)),(-n*t)))/(YTM/n);
-        double valueFromRedemption = faceValue/Math.pow((1+(YTM/2)),(n*t));
-        double Coupon = (faceValue*(newCouponRate))/n;
-        double PV= Coupon*valueFromInterest+valueFromRedemption;
+    public double setValue(double bondFaceValue){
+        return Math.round(bondFaceValue * 100.0) / 100.0;
+    }
 
-        return PV*quantity;
+    @Override
+    public String toString() {
+        return "Bond Name: " + this.bondSymbol  + ", Face Value: " + this.faceValue
+                + ", Coupon Rate: " + this.couponRate
+                + ", Quantity: " + this.quantity + ", Yield: " + this.bondYield
+                + ", Expiration Date: " + this.expMonth + "/" + this.expYear + "\n";
     }
 }
