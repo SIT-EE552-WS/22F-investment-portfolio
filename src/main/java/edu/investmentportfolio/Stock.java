@@ -2,6 +2,7 @@ package edu.investmentportfolio;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,28 +13,25 @@ import java.util.Properties;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-//Stock (price, dividend, yield) 
-public class Stock implements Serializable {
+
+public class Stock implements Serializable, Instrument {
+    @Serial
     private static final long serialVersionUID = 4L;
-    private String stockname;
+    private String stockName ;
     private double price;
     private double quantity;
-    // private double dividend;
-    // private double yield;
 
     public Stock() {
     }
 
-    public Stock(String stockname, double price, double quantity) {
-        this.stockname = stockname;
+    public Stock(String stockName, double price, double quantity) {
+        this.stockName = stockName;
         this.price = price;
         this.quantity = quantity;
-        // this.dividend = dividend;
-        // this.yield = yield;
     }
 
-//This function really just gets the price of the stock, not actually buys it/updates the hashmap
-    public double buyStock(String name, double quantity) throws IOException, InterruptedException {
+    //helper to make http call for stock
+    private static double getStockPrice(String name) throws IOException, InterruptedException {
         Properties props = new Properties();
         InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("api.properties");
         if (inputStream != null) {
@@ -50,76 +48,58 @@ public class Stock implements Serializable {
 
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
-        double price = jsonObject.get("c").getAsDouble();
 
-        if (price != 0) {
-            // return price * quantity;
-            setPrice();
-            return price;
-        } else {
-            System.out.println("Invalid stock name.");
-            return 0;
+        //returns zero if the search doesn't work
+        return jsonObject.get("c").getAsDouble();
+    }
+
+    // method to buy a stock
+    public double buyStock(String name) throws IOException, InterruptedException {
+        double stockPrice = getStockPrice(name);
+        return setPriceStock(stockPrice);
+    }
+
+    // method to help display search for a stock
+    public void viewStock(String name) throws IOException, InterruptedException {
+        double stockPrice = getStockPrice(name);
+
+        if (stockPrice == 0) {
+            System.out.print("Invalid stock name.\n");
+        } else{
+            stockPrice = setPriceStock(stockPrice);
+            System.out.print("Stock Name: " + name + ", Price: " + stockPrice + "\n");
         }
     }
 
-    public String viewStock(String name, double quantity) throws IOException, InterruptedException {
-        Properties props = new Properties();
-        InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("api.properties");
-        if (inputStream != null) {
-            props.load(inputStream);
+    // method to sell a stock
+    public double sellStock(String name, double stockQuantity) throws IOException, InterruptedException {
+        double stockPrice = getStockPrice(name);
+        if (stockQuantity <= this.quantity) {
+            this.quantity -= stockQuantity;
+            stockPrice = Math.round(stockPrice * 100.0) / 100.0;
+            return stockPrice * stockQuantity;
         }
-        final String apiKey = props.getProperty("apiKey");
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://finnhub.io/api/v1/quote?symbol=" + name + "&token=" + apiKey))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
-        double price = jsonObject.get("c").getAsDouble();
-
-        if (price == 0) {
-            return "Invalid stock name.";
-        }
-
-        setPrice();
-
-        return "Stock Name: " + name + ", Quantity: " + quantity + ", Price: " + price + "\n";
+        return 0;
     }
-
     @Override
     public String toString() {
-        return "Stock Name: " + stockname + ", Quantity: " + quantity + ", Price: " + price + "\n";
+        return "Stock Name: " + stockName + ", Quantity: " + quantity + ", Price: " + price + "\n";
     }
 
-    public void addQuantity(double quantity2) {
-        this.quantity += quantity2;
+    public void addQuantity(double stockQuantity) {
+        this.quantity += stockQuantity;
     }
 
     public double getQuantity() {
-        return quantity;
+        return this.quantity;
     }
 
-    public double getPrice(){return price;}
+    public double getPrice(){return setPriceStock(this.price);}
 
-    public String getStockname(){return stockname;}
-    public double sellStock(String name, double quantity2) throws IOException, InterruptedException {
-        double price = buyStock(name, quantity2);
-        if (quantity2 > this.quantity) {
-            System.out.println("You do not have enough stock to sell that amount.");
-            return 0;
-        } else {
-            this.quantity -= quantity2;
-            price = Math.round(price * 100.0) / 100.0;
-            return price * quantity2;
-        }
-    }
+    public String getStockName(){return this.stockName;}
 
-    public void setPrice() {
-        this.price = Math.round(this.price * 100.0) / 100.0;
+    public double setPriceStock(double stockPrice) {
+        return Math.round(stockPrice * 100.0) / 100.0;
     }
 
 }
