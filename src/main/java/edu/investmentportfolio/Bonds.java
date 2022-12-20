@@ -26,6 +26,7 @@ public class Bonds implements Serializable, Instrument {
     private final double bondYield;
     private final int expMonth;
     private final int expYear;
+    static BondMarket bondMarket = new BondMarket();
 
     public Bonds(
             String bondSymbol, double faceValue, double quantity,
@@ -40,13 +41,18 @@ public class Bonds implements Serializable, Instrument {
     }
 
     //method to make the http call
-    private static JSONArray getJsonArrayBond(String name) throws IOException, InterruptedException {
+    private static JSONArray getJsonArrayBond(int name) throws IOException, InterruptedException {
+
+        return bondMarket.getJsonArrayBond(name);
+    }
+    /*
+    private static JSONArray getJsonArrayBond(int name) throws IOException, InterruptedException {
         Properties props = new Properties();
         InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("BondsClassifier.properties");
         if (inputStream != null) {
             props.load(inputStream);
         }
-        int num = setYear(name);
+        int num = name;
         String combine = "cusip" + num;
         String cusip = props.getProperty(combine);
 
@@ -58,6 +64,9 @@ public class Bonds implements Serializable, Instrument {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return new JSONArray(response.body());
     }
+
+     */
+
 
     //method to sell a bond
     public double sellBonds(double bondQuantity) {
@@ -71,7 +80,7 @@ public class Bonds implements Serializable, Instrument {
     }
 
     //method to set/buy a bond's information
-    public static double getBondInfo(String name, int numChoice) throws IOException, InterruptedException {
+    public static double getBondInfoBondYield(int name) throws IOException, InterruptedException {
         JSONArray obj = getJsonArrayBond(name);
         double getBondYield;
         String avgMedYield = "averageMedianYield";
@@ -82,13 +91,12 @@ public class Bonds implements Serializable, Instrument {
             getBondYield = Double.parseDouble(obj.getJSONObject(0).getString(avgMedYield));
         }
 
-        double couRate = Double.parseDouble(obj.getJSONObject(0).getString("interestRate"));
-
-        return switch (numChoice) {
-            case 1 -> getBondYield;
-            case 2 -> couRate;
-            default -> 0;
-        };
+        return getBondYield;
+    }
+    public static double getBondInfoCouponRate(int name) throws IOException, InterruptedException {
+        JSONArray obj = getJsonArrayBond(name);
+        double couponRate = Double.parseDouble(obj.getJSONObject(0).getString("interestRate"));
+        return couponRate;
     }
 
     public double getPresentValue() {
@@ -107,23 +115,15 @@ public class Bonds implements Serializable, Instrument {
         return setValue(pv * quantity);
     }
 
-    public static int setYear(String name){
-
-        if ("30".equals(name)) {
-            return 30;
-        } else if ("20".equals(name)) {
-            return 20;
-        } else if ("10".equals(name)) {
-            return 10;
-        } else if ("7".equals(name)) {
-            return 7;
-        } else if ("5".equals(name)) {
-            return 5;
-        } else if ("3".equals(name)) {
-            return 3;
-        } else if ("2".equals(name)) {
-            return 2;
-        } else {
+    public static int setYear(int name){
+        int bondNumber = name;
+        if ((bondNumber == 30 || bondNumber == 20 ||
+                bondNumber == 10|| bondNumber == 7||
+                bondNumber == 5|| bondNumber == 3||
+                bondNumber == 2)){
+            return bondNumber;
+        }
+        else{
             return 0;
         }
     }

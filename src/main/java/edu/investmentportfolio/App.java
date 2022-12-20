@@ -134,7 +134,7 @@ public class App {
                     break;
 
                 case 2:
-                    //Buy Crypto
+                    //search Crypto
                     System.out.print("Please enter crypto name: ");
                     String cryptoName = searchInput.nextLine();
 
@@ -166,7 +166,7 @@ public class App {
             System.out.println("4 - Main Menu \n");
 
             int option = userInput.nextInt();
-
+            //userInput.nextLine();
             switch(option){
                 case 1:
                     // Buy Stock
@@ -184,16 +184,14 @@ public class App {
                 case 2:
                     // Buy Bond
                     System.out.println("We offer a variety of multiyear bonds:");
-                    System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year\n");
+                    System.out.println("30, 20, 10, 7, 5, 3, & 2 year bonds\n");
 
                     System.out.print("Please select a bond year: ");
-                    String bondName = buyInput.nextLine();
-
-                    if (Bonds.setYear(bondName) == 0) {
+                    int bondNumber = Integer.parseInt(buyInput.nextLine());
+                    if (Bonds.setYear(bondNumber) == 0){
                         System.out.println("We do not offer that type of bond.");
                         break;
                     }
-
                     System.out.print("Please enter denomination: ");
                     double denomination = Double.parseDouble(buyInput.nextLine());
 
@@ -201,7 +199,7 @@ public class App {
                     double quantity = Double.parseDouble(buyInput.nextLine());
 
                     System.out.print("\n");
-                    user.addBond(bondName, denomination, quantity);
+                    user.addBond(bondNumber, denomination, quantity);
                     break;
 
                 case 3:
@@ -263,7 +261,7 @@ public class App {
                     user.viewBonds();
                     System.out.println("_________________");
 
-                    System.out.print("Please enter bond name: ");
+                    System.out.print("Please enter bond year: ");
                     String bondName = sellInput.nextLine();
 
                     System.out.print("Please enter quantity: ");
@@ -303,7 +301,7 @@ public class App {
     }
 
     // method for handling the value selection.
-    private static void value(Account user) {
+    private static void value(Account user) throws IOException, InterruptedException {
         while (true) {
 
             System.out.println("1 - Stocks");
