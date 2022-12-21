@@ -23,6 +23,7 @@ Security Instruments -> _Cash, Stocks, Cryptocurrency, Bonds_
 **Additional Feature**
 
 * Displaying portfolio information as a pie-chart
+* Display Real-time price information
 
 
 
