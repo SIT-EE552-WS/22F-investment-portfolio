@@ -114,7 +114,6 @@ public class Account implements Serializable {
             } else {
                 double price = stock.sellStock(name, quantity);
                 System.out.println("Transaction Successful");
-                System.out.println(name + " gained $" + price + ".");
                 this.cash.deposit(price);
                 if (stock.getQuantity() == 0) {
                     portfolio.remove(name);
@@ -287,7 +286,6 @@ public class Account implements Serializable {
             } else {
                 System.out.println("Transaction Successful");
                 double price = crypto.sellCrypto(name, quantity);
-                System.out.println(name + " gained $" + price + ".");
                 this.cash.deposit(price);
                 if (crypto.getQuantity() == 0) {
                     portfolio.remove(name);
