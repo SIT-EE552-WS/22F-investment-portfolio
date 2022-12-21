@@ -1,17 +1,8 @@
 package edu.investmentportfolio;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serial;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Properties;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 
 public class Stock implements Serializable, Instrument {
@@ -20,11 +11,11 @@ public class Stock implements Serializable, Instrument {
     private String stockName ;
     private double price;
     private double quantity;
-
-    public Stock() {
+    static StockMarket stockMarket = new StockMarket();
+    public Stock() throws IOException {
     }
 
-    public Stock(String stockName, double price, double quantity) {
+    public Stock(String stockName, double price, double quantity) throws IOException {
         this.stockName = stockName;
         this.price = price;
         this.quantity = quantity;
@@ -32,26 +23,10 @@ public class Stock implements Serializable, Instrument {
 
     //helper to make http call for stock
     private static double getStockPrice(String name) throws IOException, InterruptedException {
-        Properties props = new Properties();
-        InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("api.properties");
-        if (inputStream != null) {
-            props.load(inputStream);
-        }
-        final String apiKey = props.getProperty("apiKey");
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://finnhub.io/api/v1/quote?symbol=" + name + "&token=" + apiKey))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
-
-        //returns zero if the search doesn't work
-        return jsonObject.get("c").getAsDouble();
+        return stockMarket.getStockPrice(name);
     }
+
+
 
     // method to buy a stock
     public double buyStock(String name) throws IOException, InterruptedException {
@@ -83,7 +58,7 @@ public class Stock implements Serializable, Instrument {
     }
     @Override
     public String toString() {
-        return "Stock Name: " + stockName + ", Quantity: " + quantity + ", Price: " + price + "\n";
+        return "Stock Name: " + stockName + ", Quantity: " + quantity + ", Purchased Price: " + price + "\n";
     }
 
     public void addQuantity(double stockQuantity) {

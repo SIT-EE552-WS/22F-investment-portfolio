@@ -3,10 +3,8 @@ package edu.investmentportfolio;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.time.LocalDate;
 
 import org.knowm.xchart.*;
 import org.knowm.xchart.style.PieStyler;
@@ -14,16 +12,14 @@ import org.knowm.xchart.style.Styler;
 
 
 
+@SuppressWarnings("DuplicatedCode")
 public class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 4L;
     private final HashMap<String, Instrument> portfolio = new HashMap<>();
     private final Cash cash = new Cash();
-    private String firstName;
-    private String lastName;
-
-    public Account() {
-    }
+    private final String firstName;
+    private final String lastName;
 
     public Account(String firstName, String lastName, double cash) {
         this.firstName = firstName;
@@ -82,11 +78,11 @@ public class Account implements Serializable {
     }
 
 
-    public void valueStocks() {
+    public void valueStocks() throws IOException, InterruptedException {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                double value = Math.round((stock.getQuantity() * stock.getPrice()) * 100.0) / 100.0;
+                double value = Math.round((stock.getQuantity() * stock.buyStock(stock.getStockName())) * 100.0) / 100.0;
                 sum += value;
                 System.out.println(stock.getStockName() + ": $" + value);
             }
@@ -95,11 +91,11 @@ public class Account implements Serializable {
         System.out.println("Total value = $" + sum);
     }
 
-    public double getValueStocks() {
+    public double getValueStocks() throws IOException, InterruptedException {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                double value = Math.round((stock.getQuantity() * stock.getPrice()) * 100.0) / 100.0;
+                double value = Math.round((stock.getQuantity() * stock.buyStock(stock.getStockName())) * 100.0) / 100.0;
                 sum += value;
             }
         }
@@ -116,7 +112,6 @@ public class Account implements Serializable {
             } else {
                 double price = stock.sellStock(name, quantity);
                 System.out.println("Transaction Successful");
-                System.out.println(name + " gained $" + price + ".");
                 this.cash.deposit(price);
                 if (stock.getQuantity() == 0) {
                     portfolio.remove(name);
@@ -134,20 +129,17 @@ public class Account implements Serializable {
     }
 
     ////////////////// Bonds //////////////////
-    public void addBond(String name, double faceValue, double quantity) throws IOException, InterruptedException {
+    public void addBond(int name, double faceValue, double quantity) throws IOException, InterruptedException {
+
         if (Bonds.setYear(name) != 0) {
             double amount = faceValue * quantity;
+            LocalDate localDate = LocalDate.now(); // sets date to today
+            localDate = localDate.plusYears(name); // adds however many years the bond lasts
+            int expMonth = localDate.getMonthValue();
+            int expYear = localDate.getYear();
 
-            Date date = new Date();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            int val = Bonds.setYear(name) * 365;
-            cal.add(Calendar.DATE, val); // adds however many years
-            int expMonth = cal.get(Calendar.MONTH) + 1; // January starts at 0 for some reason so, I have to add 1
-            int expYear = cal.get(Calendar.YEAR);
-
-            double couRate = Bonds.getBondInfo(name, 2);
-            double yieldVal = Bonds.getBondInfo(name, 1);
+            double couRate = Bonds.getBondInfoCouponRate(name);
+            double yieldVal = Bonds.getBondInfoBondYield(name);
 
             if (faceValue != 0) {
                 if (this.cash.getBalance() < amount) {
@@ -155,14 +147,14 @@ public class Account implements Serializable {
                 } else {
                     this.cash.withdraw(amount);
                     //now here
-                    name = name +"year";
-                    if (portfolio.containsKey(name)) {
-                        Bonds bond = (Bonds) portfolio.get(name);
+                    String finalName = name +"year";
+                    if (portfolio.containsKey(finalName)) {
+                        Bonds bond = (Bonds) portfolio.get(finalName);
                         bond.addQuantity(quantity);
                     } else {
                         // was here
-                        Bonds bond = new Bonds(name, faceValue, quantity, couRate, yieldVal, expMonth, expYear);
-                        portfolio.put(name, bond);
+                        Bonds bond = new Bonds(finalName, faceValue, quantity, couRate, yieldVal, expMonth, expYear);
+                        portfolio.put(finalName, bond);
                     }
                     System.out.println("Transaction Successful");
                 }
@@ -180,6 +172,7 @@ public class Account implements Serializable {
         }
     }
 
+    // This function prints out the value of each bond and the final sum
     public void valueBonds() {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
@@ -192,7 +185,7 @@ public class Account implements Serializable {
         System.out.println("Total present value = $" + sum);
     }
 
-
+    // This function calculates the value of all bonds and returns the final sum without printing everything out
     public double getValueBonds() {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
@@ -256,11 +249,11 @@ public class Account implements Serializable {
         }
     }
 
-    public void valueCrypto() {
+    public void valueCrypto() throws IOException, InterruptedException {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                double value = Math.round((crypto.getQuantity()*crypto.getPrice()) * 100.0) / 100.0;
+                double value = Math.round((crypto.getQuantity()*crypto.buyCrypto(crypto.getCryptoName())) * 100.0) / 100.0;
                 sum += value;
                 System.out.println(crypto.getCryptoName()+": $" + value);
             }
@@ -270,11 +263,11 @@ public class Account implements Serializable {
     }
 
 
-    public double getValueCrypto() {
+    public double getValueCrypto() throws IOException, InterruptedException {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                double value = Math.round((crypto.getQuantity()*crypto.getPrice()) * 100.0) / 100.0;
+                double value = Math.round((crypto.getQuantity()*crypto.buyCrypto(crypto.getCryptoName())) * 100.0) / 100.0;
                 sum += value;
             }
         }
@@ -290,7 +283,6 @@ public class Account implements Serializable {
             } else {
                 System.out.println("Transaction Successful");
                 double price = crypto.sellCrypto(name, quantity);
-                System.out.println(name + " gained $" + price + ".");
                 this.cash.deposit(price);
                 if (crypto.getQuantity() == 0) {
                     portfolio.remove(name);
@@ -343,13 +335,12 @@ public class Account implements Serializable {
     }
 
 
-    public void valuePortfolio() {
+    public void valuePortfolio() throws IOException, InterruptedException {
         headerAccount();
-
         double sumStock = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                double value = Math.round((stock.getQuantity() * stock.getPrice()) * 100.0) / 100.0;
+                double value = Math.round((stock.getQuantity() * stock.buyStock(stock.getStockName())) * 100.0) / 100.0;
                 sumStock += value;
                 System.out.println(stock.getStockName()+": $" + value);
             }
@@ -359,6 +350,7 @@ public class Account implements Serializable {
         }
         sumStock = Math.round(sumStock * 100.0) / 100.0;
         System.out.println("Total Stock Value = $" + sumStock);
+
         System.out.println("________________________________________________________");
 
 
@@ -382,7 +374,7 @@ public class Account implements Serializable {
         double sumCrypto = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                double value = Math.round((crypto.getQuantity()*crypto.getPrice()) * 100.0) / 100.0;
+                double value = Math.round((crypto.getQuantity()*crypto.buyCrypto(crypto.getCryptoName())) * 100.0) / 100.0;
                 sumCrypto += value;
                 System.out.println(crypto.getCryptoName()+": $" + value);
             }
@@ -404,7 +396,7 @@ public class Account implements Serializable {
     //The graph function was based on code from the developer of x-chart
     //https://stackoverflow.com/questions/13662984/creating-pie-charts-programmatically
 
-    public void holdingsGraph() {
+    public void holdingsGraph() throws IOException, InterruptedException {
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
         PieChart chart = new PieChartBuilder().width(800).height(600).title("Financial Instruments Graph").theme(Styler.ChartTheme.GGPlot2).build();
 

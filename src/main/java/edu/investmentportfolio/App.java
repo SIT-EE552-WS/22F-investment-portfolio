@@ -9,12 +9,8 @@ import java.util.Scanner;
  */
 public class App {
 
-    // scanners created for the use of the program.
-    static Scanner userInput = new Scanner(System.in);
-    static Scanner cashInput = new Scanner(System.in);
-    static Scanner sellInput = new Scanner(System.in);
-    static Scanner buyInput = new Scanner(System.in);
-    static Scanner searchInput = new Scanner(System.in);
+    //This will be the only scanner:
+    static Scanner scanner = new Scanner(System.in);
 
     public static void save(Account user) throws IOException{
         String name = user.getFirstName().toLowerCase() + "_" + user.getLastName().toLowerCase();
@@ -51,7 +47,7 @@ public class App {
 
         System.out.print("\nWelcome to your new account: " + firstName + " " + lastName);
         System.out.print("\nWhat is your starting balance for investment? ");
-        double startingBalance = Double.parseDouble(userInput.nextLine());
+        double startingBalance = Double.parseDouble(scanner.nextLine());
 
         return new Account(firstName, lastName, startingBalance);
     }
@@ -60,10 +56,10 @@ public class App {
         System.out.println("Investment Portfolio Simulator");
 
         System.out.print("What is your first name? ");
-        String firstName = userInput.nextLine();
+        String firstName = scanner.nextLine();
 
         System.out.print("What is your last name? ");
-        String lastName = userInput.nextLine();
+        String lastName = scanner.nextLine();
 
         Account user = check(firstName, lastName);
 
@@ -72,7 +68,7 @@ public class App {
         while (running) {
             mainMenu();
 
-            int input = userInput.nextInt();
+            int input = scanner.nextInt();
 
             switch (input) {
                 case 0 -> search(user);
@@ -91,11 +87,7 @@ public class App {
                 }
             }
         }
-        userInput.close();
-        buyInput.close();
-        sellInput.close();
-        cashInput.close();
-        searchInput.close();
+        scanner.close();
         save(user);
         System.out.print("\nPortfolio Saved. Until next time!\n");
         System.exit(0);
@@ -120,13 +112,14 @@ public class App {
             System.out.println("2 - Crypto");
             System.out.println("3 - Main Menu \n");
 
-            int option = userInput.nextInt();
+            int option = scanner.nextInt();
+            scanner.nextLine();
 
             switch (option) {
                 case 1:
                     // search Stock
                     System.out.print("Please enter stock name: ");
-                    String stockName = searchInput.nextLine();
+                    String stockName = scanner.nextLine();
 
                     System.out.print("\n");
                     stockName = stockName.toUpperCase();
@@ -134,9 +127,9 @@ public class App {
                     break;
 
                 case 2:
-                    //Buy Crypto
+                    //search Crypto
                     System.out.print("Please enter crypto name: ");
-                    String cryptoName = searchInput.nextLine();
+                    String cryptoName = scanner.nextLine();
 
                     System.out.print("\n");
                     cryptoName = cryptoName.toLowerCase();
@@ -165,16 +158,17 @@ public class App {
             System.out.println("3 - Crypto");
             System.out.println("4 - Main Menu \n");
 
-            int option = userInput.nextInt();
+            int option = scanner.nextInt();
+            scanner.nextLine();
 
             switch(option){
                 case 1:
                     // Buy Stock
                     System.out.print("Please enter stock name: ");
-                    String stockName = buyInput.nextLine();
+                    String stockName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double stockQuantity =  Double.parseDouble(buyInput.nextLine());
+                    double stockQuantity =  Double.parseDouble(scanner.nextLine());
 
                     System.out.print("\n");
                     stockName = stockName.toUpperCase();
@@ -184,33 +178,31 @@ public class App {
                 case 2:
                     // Buy Bond
                     System.out.println("We offer a variety of multiyear bonds:");
-                    System.out.println("30year, 20year, 10year, 7year, 5year, 3year, 2year\n");
+                    System.out.println("30, 20, 10, 7, 5, 3, & 2 year bonds\n");
 
                     System.out.print("Please select a bond year: ");
-                    String bondName = buyInput.nextLine();
-
-                    if (Bonds.setYear(bondName) == 0) {
+                    int bondNumber = Integer.parseInt(scanner.nextLine());
+                    if (Bonds.setYear(bondNumber) == 0){
                         System.out.println("We do not offer that type of bond.");
                         break;
                     }
-
                     System.out.print("Please enter denomination: ");
-                    double denomination = Double.parseDouble(buyInput.nextLine());
+                    double denomination = Double.parseDouble(scanner.nextLine());
 
                     System.out.print("Please enter quantity: ");
-                    double quantity = Double.parseDouble(buyInput.nextLine());
+                    double quantity = Double.parseDouble(scanner.nextLine());
 
                     System.out.print("\n");
-                    user.addBond(bondName, denomination, quantity);
+                    user.addBond(bondNumber, denomination, quantity);
                     break;
 
                 case 3:
                     //Buy Crypto
                     System.out.print("Please enter crypto name: ");
-                    String cryptoName = buyInput.nextLine();
+                    String cryptoName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double cryptoQuantity = Double.parseDouble(buyInput.nextLine());
+                    double cryptoQuantity = Double.parseDouble(scanner.nextLine());
 
                     System.out.print("\n");
                     cryptoName = cryptoName.toLowerCase();
@@ -238,7 +230,8 @@ public class App {
             System.out.println("2 - Bonds");
             System.out.println("3 - Crypto");
             System.out.println("4 - Main Menu");
-            int option = userInput.nextInt();
+            int option = scanner.nextInt();
+            scanner.nextLine();
 
             switch(option){
                 case 1:
@@ -248,10 +241,10 @@ public class App {
                     System.out.println("_________________");
 
                     System.out.print("Please enter stock name: ");
-                    String stockName = sellInput.nextLine();
+                    String stockName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double stockQuantity = Double.parseDouble(sellInput.nextLine());
+                    double stockQuantity = Double.parseDouble(scanner.nextLine());
 
                     System.out.print("\n");
                     user.sellStock(stockName, stockQuantity);
@@ -263,11 +256,11 @@ public class App {
                     user.viewBonds();
                     System.out.println("_________________");
 
-                    System.out.print("Please enter bond name: ");
-                    String bondName = sellInput.nextLine();
+                    System.out.print("Please enter bond year: ");
+                    String bondName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double bondQuantity = Double.parseDouble(sellInput.nextLine());
+                    double bondQuantity = Double.parseDouble(scanner.nextLine());
 
                     System.out.print("\n");
                     user.sellBond(bondName, bondQuantity);
@@ -280,10 +273,10 @@ public class App {
                     System.out.println("_________________");
 
                     System.out.print("Please enter crypto name: ");
-                    String cryptoName = sellInput.nextLine();
+                    String cryptoName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double cryptoQuantity = Double.parseDouble(sellInput.nextLine());
+                    double cryptoQuantity = Double.parseDouble(scanner.nextLine());
 
                     System.out.print("\n");
                     user.sellCrypto(cryptoName, cryptoQuantity);
@@ -303,7 +296,7 @@ public class App {
     }
 
     // method for handling the value selection.
-    private static void value(Account user) {
+    private static void value(Account user) throws IOException, InterruptedException {
         while (true) {
 
             System.out.println("1 - Stocks");
@@ -312,7 +305,8 @@ public class App {
             System.out.println("4 - Portfolio");
             System.out.println("5 - Main Menu");
 
-            int option = userInput.nextInt();
+            int option = scanner.nextInt();
+            scanner.nextLine();
 
             switch(option){
                 case 1:
@@ -361,7 +355,8 @@ public class App {
             System.out.println("4 - Portfolio");
             System.out.println("5 - Main Menu");
 
-            int option = userInput.nextInt();
+            int option = scanner.nextInt();
+            scanner.nextLine();
 
             switch(option){
                 case 1:
@@ -407,13 +402,14 @@ public class App {
             System.out.println("1 - Withdraw");
             System.out.println("2 - Deposit");
             System.out.println("3 - Main Menu");
-            int option = userInput.nextInt();
+            int option = scanner.nextInt();
+            scanner.nextLine();
 
             switch(option){
                 case 1:
                     // Withdraw
                     System.out.print("How much would you like to withdraw? ");
-                    double withDraw = Double.parseDouble(cashInput.nextLine());
+                    double withDraw = Double.parseDouble(scanner.nextLine());
                     System.out.print("\nBalance: ");
                     user.withdrawCash(withDraw);
                     user.viewBalance();
@@ -422,7 +418,7 @@ public class App {
                 case 2:
                     // Deposit
                     System.out.print("How much would you like to deposit? ");
-                    double dePosit = Double.parseDouble(cashInput.nextLine());
+                    double dePosit = Double.parseDouble(scanner.nextLine());
                     user.addCash(dePosit);
 
                     System.out.print("\nBalance: ");

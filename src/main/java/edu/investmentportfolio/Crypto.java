@@ -3,13 +3,7 @@ package edu.investmentportfolio;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 // Possible examples include bitcoin, ethereum, tether, binance coin,theta-token, etc.
 // Anything under "id" on this page should work:
@@ -21,6 +15,7 @@ public class Crypto implements Serializable, Instrument{
     private String cryptoName;
     private double price;
     private double quantity;
+    static CryptoMarket cryptoMarket = new CryptoMarket();
 
 
     public Crypto() {
@@ -34,22 +29,7 @@ public class Crypto implements Serializable, Instrument{
 
     //helper to make http call for crypto
     private static double getCryptoPrice(String name) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(
-                        "https://api.coingecko.com/api/v3/simple/price?ids=" + name + "&vs_currencies=usd"))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if ("{}".equals(response.body())) {
-            return 0;
-        }
-        else {
-            Gson gson = new Gson();
-            JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
-            JsonObject topJson = jsonObject.getAsJsonObject(name);
-
-            return topJson.get("usd").getAsDouble();
-        }
+        return cryptoMarket.getCryptoPrice(name);
     }
 
     //method to buy crypto
@@ -85,9 +65,7 @@ public class Crypto implements Serializable, Instrument{
         return "Crypto Name: " + this.cryptoName + ", Quantity: " + this.quantity + ", Price: " + this.price + "\n";
     }
 
-    public void addQuantity(double quantity2) {
-        this.quantity += quantity2;
-    }
+    public void addQuantity(double quantity2) {this.quantity += quantity2;}
 
     public double getQuantity() {
         return this.quantity;
