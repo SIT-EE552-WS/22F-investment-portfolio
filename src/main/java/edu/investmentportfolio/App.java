@@ -9,16 +9,6 @@ import java.util.Scanner;
  */
 public class App {
 
-    // scanners created for the use of the program.
-    /*
-    static Scanner userInput = new Scanner(System.in);
-    static Scanner cashInput = new Scanner(System.in);
-    static Scanner sellInput = new Scanner(System.in);
-    static Scanner buyInput = new Scanner(System.in);
-    static Scanner searchInput = new Scanner(System.in);
-
-     */
-
     //This will be the only scanner:
     static Scanner scanner = new Scanner(System.in);
 
@@ -176,11 +166,9 @@ public class App {
                     // Buy Stock
                     System.out.print("Please enter stock name: ");
                     String stockName = scanner.nextLine();
-                    //scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
                     double stockQuantity =  Double.parseDouble(scanner.nextLine());
-                    //scanner.nextLine();
 
                     System.out.print("\n");
                     stockName = stockName.toUpperCase();
@@ -212,7 +200,6 @@ public class App {
                     //Buy Crypto
                     System.out.print("Please enter crypto name: ");
                     String cryptoName = scanner.nextLine();
-                    //scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
                     double cryptoQuantity = Double.parseDouble(scanner.nextLine());
@@ -271,7 +258,6 @@ public class App {
 
                     System.out.print("Please enter bond year: ");
                     String bondName = scanner.nextLine();
-                    //scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
                     double bondQuantity = Double.parseDouble(scanner.nextLine());
@@ -288,7 +274,6 @@ public class App {
 
                     System.out.print("Please enter crypto name: ");
                     String cryptoName = scanner.nextLine();
-                    //scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
                     double cryptoQuantity = Double.parseDouble(scanner.nextLine());

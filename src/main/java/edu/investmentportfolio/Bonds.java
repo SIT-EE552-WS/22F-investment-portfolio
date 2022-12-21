@@ -1,21 +1,14 @@
 package edu.investmentportfolio;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serial;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Properties;
 
 import org.json.JSONArray;
 
 // Bond/fixed income (price, coupon, yield, expDate)
 // yield is the same as coupon rate
 
-@SuppressWarnings("SpellCheckingInspection")
 public class Bonds implements Serializable, Instrument {
     @Serial
     private static final long serialVersionUID = 4L;
@@ -45,28 +38,6 @@ public class Bonds implements Serializable, Instrument {
 
         return bondMarket.getJsonArrayBond(name);
     }
-    /*
-    private static JSONArray getJsonArrayBond(int name) throws IOException, InterruptedException {
-        Properties props = new Properties();
-        InputStream inputStream = Stock.class.getClassLoader().getResourceAsStream("BondsClassifier.properties");
-        if (inputStream != null) {
-            props.load(inputStream);
-        }
-        int num = name;
-        String combine = "cusip" + num;
-        String cusip = props.getProperty(combine);
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(
-                        "https://www.treasurydirect.gov/TA_WS/securities/search?cusip=" + cusip + "&format=json"))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return new JSONArray(response.body());
-    }
-
-     */
-
 
     //method to sell a bond
     public double sellBonds(double bondQuantity) {
@@ -95,8 +66,7 @@ public class Bonds implements Serializable, Instrument {
     }
     public static double getBondInfoCouponRate(int name) throws IOException, InterruptedException {
         JSONArray obj = getJsonArrayBond(name);
-        double couponRate = Double.parseDouble(obj.getJSONObject(0).getString("interestRate"));
-        return couponRate;
+        return Double.parseDouble(obj.getJSONObject(0).getString("interestRate"));
     }
 
     public double getPresentValue() {
@@ -116,12 +86,11 @@ public class Bonds implements Serializable, Instrument {
     }
 
     public static int setYear(int name){
-        int bondNumber = name;
-        if ((bondNumber == 30 || bondNumber == 20 ||
-                bondNumber == 10|| bondNumber == 7||
-                bondNumber == 5|| bondNumber == 3||
-                bondNumber == 2)){
-            return bondNumber;
+        if ((name == 30 || name == 20 ||
+                name == 10|| name == 7||
+                name == 5|| name == 3||
+                name == 2)){
+            return name;
         }
         else{
             return 0;

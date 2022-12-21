@@ -12,16 +12,14 @@ import org.knowm.xchart.style.Styler;
 
 
 
+@SuppressWarnings("DuplicatedCode")
 public class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 4L;
     private final HashMap<String, Instrument> portfolio = new HashMap<>();
     private final Cash cash = new Cash();
-    private String firstName;
-    private String lastName;
-
-    public Account() {
-    }
+    private final String firstName;
+    private final String lastName;
 
     public Account(String firstName, String lastName, double cash) {
         this.firstName = firstName;
@@ -136,8 +134,7 @@ public class Account implements Serializable {
         if (Bonds.setYear(name) != 0) {
             double amount = faceValue * quantity;
             LocalDate localDate = LocalDate.now(); // sets date to today
-            int val = name;
-            localDate = localDate.plusYears(val); // adds however many years the bond lasts
+            localDate = localDate.plusYears(name); // adds however many years the bond lasts
             int expMonth = localDate.getMonthValue();
             int expYear = localDate.getYear();
 
