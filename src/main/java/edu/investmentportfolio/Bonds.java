@@ -3,27 +3,32 @@ package edu.investmentportfolio;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 
 import org.json.JSONArray;
 
 // Bond/fixed income (price, coupon, yield, expDate)
 // yield is the same as coupon rate
+// The source below states Treasury Bonds can be purchased as fractions, so we set quantity as BigDecimal
+// https://www.cmegroup.com/education/courses/introduction-to-treasuries/calculating-us-treasury-pricing.html
 
 public class Bonds implements Serializable, Instrument {
     @Serial
     private static final long serialVersionUID = 4L;
     private final String bondSymbol;
-    private final double faceValue;
-    private double quantity;
-    private final double couponRate;
-    private final double bondYield;
+    private final BigDecimal faceValue;
+    private BigDecimal quantity;
+    private final BigDecimal couponRate;
+    private final BigDecimal bondYield;
     private final int expMonth;
     private final int expYear;
     static BondMarket bondMarket = new BondMarket();
 
     public Bonds(
-            String bondSymbol, double faceValue, double quantity,
-            double couponRate, double bondYield, int expMonth, int expYear) {
+            String bondSymbol, BigDecimal faceValue, BigDecimal quantity,
+            BigDecimal couponRate, BigDecimal bondYield, int expMonth, int expYear) {
         this.bondSymbol = bondSymbol;
         this.faceValue = faceValue;
         this.quantity = quantity;
@@ -40,49 +45,61 @@ public class Bonds implements Serializable, Instrument {
     }
 
     //method to sell a bond
-    public double sellBonds(double bondQuantity) {
-        double sellPrice = setValue(this.faceValue);
-        if (bondQuantity <= this.quantity) {
-            this.quantity -= bondQuantity;
+    public BigDecimal sellBonds(BigDecimal bondQuantity) {
+        BigDecimal sellPrice = setValue(this.faceValue);
+
+        if (bondQuantity.compareTo(this.quantity) <= 0) {
+            this.quantity = this.quantity.subtract(bondQuantity);
             sellPrice = setValue(sellPrice);
-            return sellPrice * bondQuantity;
+            return sellPrice.multiply(bondQuantity);
         }
-        return 0;
+        return BigDecimal.ZERO;
     }
 
     //method to set/buy a bond's information
-    public static double getBondInfoBondYield(int name) throws IOException, InterruptedException {
+    public static BigDecimal getBondInfoBondYield(int name) throws IOException, InterruptedException {
         JSONArray obj = getJsonArrayBond(name);
-        double getBondYield;
+        BigDecimal getBondYield;
         String avgMedYield = "averageMedianYield";
         if ("".equals(obj.getJSONObject(0).getString(avgMedYield))){
-            getBondYield = Double.parseDouble(obj.getJSONObject(1).getString(avgMedYield));
+            getBondYield = BigDecimal.valueOf(Double.parseDouble((obj.getJSONObject(1).getString(avgMedYield))));
 
         } else {
-            getBondYield = Double.parseDouble(obj.getJSONObject(0).getString(avgMedYield));
+            getBondYield = BigDecimal.valueOf(Double.parseDouble((obj.getJSONObject(0).getString(avgMedYield))));
         }
 
         return getBondYield;
     }
-    public static double getBondInfoCouponRate(int name) throws IOException, InterruptedException {
+    public static BigDecimal getBondInfoCouponRate(int name) throws IOException, InterruptedException {
         JSONArray obj = getJsonArrayBond(name);
-        return Double.parseDouble(obj.getJSONObject(0).getString("interestRate"));
+        return BigDecimal.valueOf( Double.parseDouble( obj.getJSONObject(0).getString("interestRate")));
     }
 
-    public double getPresentValue() {
+    public BigDecimal getPresentValue() {
         // Formula taken from https://www.wallstreetmojo.com/bond-pricing-formula/
-        double n = 2; //treasury bonds are semi-annual
+        BigDecimal n = BigDecimal.valueOf(2); //treasury bonds are semi-annual
         int t = expYear - 2022;
-        double ytm = 0.0377; // This value (3.77%) was taken from averaging multiple YTMs for different bonds using data from https://ycharts.com/indicators
+        BigDecimal ytm = BigDecimal.valueOf(0.0377); // This value (3.77%) was taken from averaging multiple YTMs for different bonds using data from https://ycharts.com/indicators
         // (ex. YTM for a 7-year bond is 3.69 from https://ycharts.com/indicators/7_year_treasury_rate )
-        double newCouponRate = couponRate/100;
+        BigDecimal newCouponRate = couponRate.divide(BigDecimal.valueOf(100));
 
-        double valueFromInterest = ( 1 - Math.pow( ( 1 + (ytm / n) ),( -n * t ))) / (ytm / n);
-        double valueFromRedemption = faceValue / Math.pow( ( 1 + (ytm / 2)),( n * t));
-        double coupon = ( faceValue * ( newCouponRate ) ) / n;
-        double pv = coupon * valueFromInterest + valueFromRedemption;
 
-        return setValue(pv * quantity);
+        BigDecimal base =(BigDecimal.ONE.add(ytm.divide(n)) );
+        BigDecimal exp = ((n.negate()).multiply(BigDecimal.valueOf(t)));
+        BigDecimal power = BigDecimal.valueOf(Math.pow( Double.valueOf(String.valueOf(base)), Double.valueOf(String.valueOf(exp))));
+
+        BigDecimal valueFromInterest = (BigDecimal.ONE.subtract(power)).divide(ytm.divide(n), 6, RoundingMode.HALF_EVEN);
+
+        BigDecimal base2 = BigDecimal.ONE.add(ytm.divide(BigDecimal.valueOf(2)));
+        BigDecimal exp2 = n.multiply(BigDecimal.valueOf(t));
+        BigDecimal power2 = BigDecimal.valueOf(Math.pow( Double.valueOf(String.valueOf(base2)), Double.valueOf(String.valueOf(exp2))));
+
+        BigDecimal valueFromRedemption = faceValue.divide(power2, 6, RoundingMode.HALF_EVEN);
+
+        BigDecimal coupon = ( faceValue.multiply(newCouponRate)).divide(n);
+        BigDecimal pv = (coupon.multiply(valueFromInterest)).add(valueFromRedemption);
+
+        return setValue(pv.multiply(quantity));
     }
 
     public static int setYear(int name){
@@ -94,11 +111,11 @@ public class Bonds implements Serializable, Instrument {
             return 0;
         }
     }
-    public void addQuantity(double newQuantity) {
-        this.quantity += newQuantity;
+    public void addQuantity(BigDecimal newQuantity) {
+        this.quantity =quantity.add(newQuantity);
     }
 
-    public double getQuantity() {
+    public BigDecimal getQuantity() {
         return this.quantity;
     }
 
@@ -106,8 +123,9 @@ public class Bonds implements Serializable, Instrument {
         return this.bondSymbol;
     }
 
-    public double setValue(double bondFaceValue){
-        return Math.round(bondFaceValue * 100.0) / 100.0;
+    public BigDecimal setValue(BigDecimal bondFaceValue){
+
+        return bondFaceValue.setScale(2, RoundingMode.HALF_EVEN);
     }
 
     @Override

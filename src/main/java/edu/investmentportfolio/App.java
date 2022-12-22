@@ -1,6 +1,7 @@
 package edu.investmentportfolio;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 /**
@@ -46,7 +47,9 @@ public class App {
 
         System.out.print("\nWelcome to your new account: " + firstName + " " + lastName);
         System.out.print("\nWhat is your starting balance for investment? ");
-        double startingBalance = Double.parseDouble(scanner.nextLine());
+        BigDecimal startingBalance = scanner.nextBigDecimal();
+        scanner.nextLine();
+
 
         return new Account(firstName, lastName, startingBalance);
     }
@@ -167,7 +170,8 @@ public class App {
                     String stockName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double stockQuantity =  Double.parseDouble(scanner.nextLine());
+                    BigDecimal stockQuantity = scanner.nextBigDecimal();
+                    scanner.nextLine();
 
                     System.out.print("\n");
                     stockName = stockName.toUpperCase();
@@ -186,10 +190,12 @@ public class App {
                         break;
                     }
                     System.out.print("Please enter denomination: ");
-                    double denomination = Double.parseDouble(scanner.nextLine());
+                    BigDecimal denomination = scanner.nextBigDecimal();
+                    scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double quantity = Double.parseDouble(scanner.nextLine());
+                    BigDecimal quantity = scanner.nextBigDecimal();
+                    scanner.nextLine();
 
                     System.out.print("\n");
                     user.addBond(bondNumber, denomination, quantity);
@@ -201,7 +207,8 @@ public class App {
                     String cryptoName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double cryptoQuantity = Double.parseDouble(scanner.nextLine());
+                    BigDecimal cryptoQuantity = scanner.nextBigDecimal();
+                    scanner.nextLine();
 
                     System.out.print("\n");
                     cryptoName = cryptoName.toLowerCase();
@@ -243,7 +250,8 @@ public class App {
                     String stockName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double stockQuantity = Double.parseDouble(scanner.nextLine());
+                    BigDecimal stockQuantity = scanner.nextBigDecimal();
+                    scanner.nextLine();
 
                     System.out.print("\n");
                     user.sellStock(stockName, stockQuantity);
@@ -260,7 +268,8 @@ public class App {
                     scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double bondQuantity = Double.parseDouble(scanner.nextLine());
+                    BigDecimal bondQuantity = scanner.nextBigDecimal();
+                    scanner.nextLine();
 
                     System.out.print("\n");
                     user.sellBond(bondName, bondQuantity);
@@ -276,7 +285,8 @@ public class App {
                     String cryptoName = scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
-                    double cryptoQuantity = Double.parseDouble(scanner.nextLine());
+                    BigDecimal cryptoQuantity = scanner.nextBigDecimal();
+                    scanner.nextLine();
 
                     System.out.print("\n");
                     user.sellCrypto(cryptoName, cryptoQuantity);
@@ -409,7 +419,8 @@ public class App {
                 case 1:
                     // Withdraw
                     System.out.print("How much would you like to withdraw? ");
-                    double withDraw = Double.parseDouble(scanner.nextLine());
+                    BigDecimal withDraw = scanner.nextBigDecimal();
+                    scanner.nextLine();
                     System.out.print("\nBalance: ");
                     user.withdrawCash(withDraw);
                     user.viewBalance();
@@ -418,7 +429,8 @@ public class App {
                 case 2:
                     // Deposit
                     System.out.print("How much would you like to deposit? ");
-                    double dePosit = Double.parseDouble(scanner.nextLine());
+                    BigDecimal dePosit = scanner.nextBigDecimal();
+                    scanner.nextLine();
                     user.addCash(dePosit);
 
                     System.out.print("\nBalance: ");

@@ -3,35 +3,37 @@ package edu.investmentportfolio;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 
 public class Stock implements Serializable, Instrument {
     @Serial
     private static final long serialVersionUID = 4L;
     private String stockName ;
-    private double price;
-    private double quantity;
+    private BigDecimal price;
+    private BigDecimal quantity; // Fractional shares are supported in many exchanges, so we set quantity as BigDecimal
     static StockMarket stockMarket = new StockMarket();
     public Stock(){
     }
 
-    public Stock(String stockName, double price, double quantity){
+    public Stock(String stockName, BigDecimal price, BigDecimal quantity){
         this.stockName = stockName;
         this.price = price;
         this.quantity = quantity;
     }
 
     //helper to make http call for stock
-    private static double getStockPrice(String name) throws IOException, InterruptedException {
-        return stockMarket.getStockPrice(name);
+    private static BigDecimal getStockPrice(String name) throws IOException, InterruptedException {
+        return BigDecimal.valueOf(stockMarket.getStockPrice(name)).setScale(2, RoundingMode.HALF_EVEN);
     }
 
 
 
     // method to buy a stock
-    public double buyStock(String name) throws IOException, InterruptedException {
-        double stockPrice = getStockPrice(name);
-        if (stockPrice == 0) {
+    public BigDecimal buyStock(String name) throws IOException, InterruptedException {
+        BigDecimal stockPrice = getStockPrice(name);
+        if (stockPrice.equals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN))) {
             System.out.print("Invalid stock name.\n");
         }
         return setPriceStock(stockPrice);
@@ -39,9 +41,9 @@ public class Stock implements Serializable, Instrument {
 
     // method to help display search for a stock
     public void viewStock(String name) throws IOException, InterruptedException {
-        double stockPrice = getStockPrice(name);
+        BigDecimal stockPrice = getStockPrice(name);
 
-        if (stockPrice == 0) {
+        if (stockPrice.equals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN))) {
             System.out.print("Invalid stock name.\n");
         } else{
             stockPrice = setPriceStock(stockPrice);
@@ -50,34 +52,31 @@ public class Stock implements Serializable, Instrument {
     }
 
     // method to sell a stock
-    public double sellStock(String name, double stockQuantity) throws IOException, InterruptedException {
-        double stockPrice = getStockPrice(name);
-        if (stockQuantity <= this.quantity) {
-            this.quantity -= stockQuantity;
-            stockPrice = Math.round(stockPrice * 100.0) / 100.0;
-            return stockPrice * stockQuantity;
+    public BigDecimal sellStock(String name, BigDecimal stockQuantity) throws IOException, InterruptedException {
+        BigDecimal stockPrice = getStockPrice(name);
+
+        if ((stockQuantity.compareTo(this.quantity) <= 0)) {
+            this.quantity = this.quantity.subtract(stockQuantity);
+            stockPrice = stockPrice.setScale(2, RoundingMode.HALF_EVEN);
+            return stockPrice.multiply(stockQuantity);
         }
-        return 0;
+        return BigDecimal.ZERO;
     }
     @Override
     public String toString() {
         return "Stock Name: " + stockName + ", Quantity: " + quantity + ", Purchased Price: " + price + "\n";
     }
 
-    public void addQuantity(double stockQuantity) {
-        this.quantity += stockQuantity;
-    }
+    public void addQuantity(BigDecimal stockQuantity) {this.quantity = this.quantity.add(stockQuantity);}
 
-    public double getQuantity() {
-        return this.quantity;
-    }
+    public BigDecimal getQuantity() {return this.quantity;}
 
-    public double getPrice(){return setPriceStock(this.price);}
+    public BigDecimal getPrice(){return setPriceStock(this.price);}
 
     public String getStockName(){return this.stockName;}
 
-    public double setPriceStock(double stockPrice) {
-        return Math.round(stockPrice * 100.0) / 100.0;
+    public BigDecimal setPriceStock(BigDecimal stockPrice) {
+        return (stockPrice.setScale(2, RoundingMode.HALF_EVEN));
     }
 
 }

@@ -3,12 +3,14 @@ package edu.investmentportfolio;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.*;
 import java.time.LocalDate;
 
 import org.knowm.xchart.*;
 import org.knowm.xchart.style.PieStyler;
 import org.knowm.xchart.style.Styler;
+import java.math.*;
 
 import javax.swing.*;
 
@@ -22,7 +24,7 @@ public class Account implements Serializable {
     private final String firstName;
     private final String lastName;
 
-    public Account(String firstName, String lastName, double cash) {
+    public Account(String firstName, String lastName, BigDecimal cash) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.cash.deposit(cash);
@@ -33,11 +35,11 @@ public class Account implements Serializable {
     public String getLastName(){return this.lastName;}
 
     ////////////////// CASH //////////////////
-    public void addCash(double cashAmount) {
+    public void addCash(BigDecimal cashAmount) {
         this.cash.deposit(cashAmount);
     }
 
-    public void withdrawCash(double cashAmount) {
+    public void withdrawCash(BigDecimal cashAmount) {
         this.cash.withdraw(cashAmount);
     }
 
@@ -46,18 +48,18 @@ public class Account implements Serializable {
     }
 
     ////////////////// STOCKS //////////////////
-    public void addStock(String name, double quantity) throws IOException, InterruptedException {
+    public void addStock(String name, BigDecimal quantity) throws IOException, InterruptedException {
         Stock desiredStock = new Stock();
-        double price = desiredStock.buyStock(name);
-        double amount = price * quantity;
+        BigDecimal price = desiredStock.buyStock(name);
+        BigDecimal amount = price.multiply(quantity);
 
         // if price is zero, then there is no stock with that name.
-        if (price != 0) {
-            if (this.cash.getBalance() < amount) {
+        if (!(price.equals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN)))) {
+            if ((this.cash.getBalance()).compareTo(amount) < 0) {
                 System.out.println("You do not have enough money to buy that stock.");
             } else {
                 System.out.println("Transaction Successful");
-                System.out.println(name + " bought at " + price + " for $" + amount);
+                System.out.println(name + " bought at $" + price + " for $" + amount);
                 this.cash.withdraw(amount);
                 if (portfolio.containsKey(name)) {
                     Stock stock = (Stock) portfolio.get(name);
@@ -80,41 +82,42 @@ public class Account implements Serializable {
 
 
     public void valueStocks() throws IOException, InterruptedException {
-        double sum = 0;
+        BigDecimal sum = BigDecimal.valueOf(0);
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                double value = Math.round((stock.getQuantity() * stock.buyStock(stock.getStockName())) * 100.0) / 100.0;
-                sum += value;
+                BigDecimal value = (stock.getQuantity()).multiply(stock.buyStock(stock.getStockName()));
+                sum =sum.add(value);
                 System.out.println(stock.getStockName() + ": $" + value);
             }
         }
-        sum = Math.round(sum * 100.0) / 100.0;
+        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
         System.out.println("Total value = $" + sum);
     }
 
-    public double getValueStocks() throws IOException, InterruptedException {
-        double sum = 0;
+    public BigDecimal getValueStocks() throws IOException, InterruptedException {
+        BigDecimal sum = BigDecimal.valueOf(0);
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                double value = Math.round((stock.getQuantity() * stock.buyStock(stock.getStockName())) * 100.0) / 100.0;
-                sum += value;
+                BigDecimal value = (stock.getQuantity()).multiply(stock.buyStock(stock.getStockName()));
+                sum = sum.add(value);
             }
         }
-        sum = Math.round(sum * 100.0) / 100.0;
+        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
         return sum;
     }
 
-    public void sellStock(String name, double quantity) throws IOException, InterruptedException {
+    public void sellStock(String name, BigDecimal quantity) throws IOException, InterruptedException {
         name = name.toUpperCase();
         if (portfolio.containsKey(name)) {
             Stock stock = (Stock) portfolio.get(name);
-            if (stock.getQuantity() < quantity) {
+
+            if ((stock.getQuantity()).compareTo(quantity) < 0) {
                 System.out.println("You do not have enough stock to sell that amount.");
             } else {
-                double price = stock.sellStock(name, quantity);
+                BigDecimal price = stock.sellStock(name, quantity);
                 System.out.println("Transaction Successful");
                 this.cash.deposit(price);
-                if (stock.getQuantity() == 0) {
+                if (stock.getQuantity().setScale(0, RoundingMode.HALF_EVEN).equals(BigDecimal.ZERO)) {
                     portfolio.remove(name);
                     System.out.println("No longer have any " + name + " stocks.");
                 }
@@ -130,20 +133,21 @@ public class Account implements Serializable {
     }
 
     ////////////////// Bonds //////////////////
-    public void addBond(int name, double faceValue, double quantity) throws IOException, InterruptedException {
+    public void addBond(int name, BigDecimal faceValue, BigDecimal quantity) throws IOException, InterruptedException {
 
         if (Bonds.setYear(name) != 0) {
-            double amount = faceValue * quantity;
+            BigDecimal amount = faceValue.multiply(quantity);
             LocalDate localDate = LocalDate.now(); // sets date to today
             localDate = localDate.plusYears(name); // adds however many years the bond lasts
             int expMonth = localDate.getMonthValue();
             int expYear = localDate.getYear();
 
-            double couRate = Bonds.getBondInfoCouponRate(name);
-            double yieldVal = Bonds.getBondInfoBondYield(name);
+            BigDecimal couRate = Bonds.getBondInfoCouponRate(name);
+            BigDecimal yieldVal = Bonds.getBondInfoBondYield(name);
 
-            if (faceValue != 0) {
-                if (this.cash.getBalance() < amount) {
+            if (!faceValue.equals(BigDecimal.ZERO)) {
+
+                if ((this.cash.getBalance().compareTo(amount) < 0)) {
                     System.out.println("You do not have enough money to buy that bond.");
                 } else {
                     this.cash.withdraw(amount);
@@ -173,40 +177,41 @@ public class Account implements Serializable {
 
     // This function prints out the value of each bond and the final sum
     public void valueBonds() {
-        double sum = 0;
+        BigDecimal sum = BigDecimal.valueOf(0);
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Bonds bond) {
-                sum += bond.getPresentValue();
+                sum = sum.add(bond.getPresentValue());
                 System.out.println(bond.getBondSymbol()+": $" + bond.getPresentValue());
             }
         }
-        sum = Math.round(sum * 100.0) / 100.0;
+        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
         System.out.println("Total present value = $" + sum);
     }
 
     // This function calculates the value of all bonds and returns the final sum without printing the value of each bond or the final sum
-    public double getValueBonds() {
-        double sum = 0;
+    public BigDecimal getValueBonds() {
+        BigDecimal sum = BigDecimal.valueOf(0);
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Bonds bond) {
-                sum += bond.getPresentValue();
+                sum =sum.add(bond.getPresentValue());
             }
         }
-        sum = Math.round(sum * 100.0) / 100.0;
+        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
         return sum;
     }
 
-    public void sellBond(int name, double quantity) {
+    public void sellBond(int name, BigDecimal quantity) {
         String nameString =  name + "year";
         if (portfolio.containsKey(nameString)) {
             Bonds bond = (Bonds) portfolio.get(nameString);
-            if (bond.getQuantity() < quantity) {
+
+            if ((bond.getQuantity().compareTo(quantity) < 0)) {
                 System.out.println("You do not have enough bonds to sell that amount.");
             } else {
                 System.out.println("Transaction Successful");
-                double price = bond.sellBonds(quantity);
+                BigDecimal price = bond.sellBonds(quantity);
                 this.cash.deposit(price);
-                if (bond.getQuantity() == 0) {
+                if (bond.getQuantity().setScale(0, RoundingMode.HALF_EVEN).equals(BigDecimal.ZERO)) {
                     portfolio.remove(nameString);
                     System.out.println("No longer have a " + nameString + " bond.");
                 }
@@ -217,13 +222,14 @@ public class Account implements Serializable {
     }
 
     ////////////////// Crypto //////////////////
-    public void addCrypto(String name, double quantity) throws IOException, InterruptedException {
+    public void addCrypto(String name, BigDecimal quantity) throws IOException, InterruptedException {
         Crypto desiredCrypto = new Crypto();
-        double price = desiredCrypto.buyCrypto(name);
-        double amount = price * quantity;
+        BigDecimal price = desiredCrypto.buyCrypto(name);
+        BigDecimal amount = price.multiply(quantity);
 
-        if (price != 0) {
-            if (this.cash.getBalance() < amount) {
+        if (!(price.equals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN)))) {
+
+            if ((this.cash.getBalance().compareTo(amount) < 0)) {
                 System.out.println("You do not have enough money to buy that Crypto.");
             } else {
                 System.out.println("Transaction Successful");
@@ -249,41 +255,42 @@ public class Account implements Serializable {
     }
 
     public void valueCrypto() throws IOException, InterruptedException {
-        double sum = 0;
+        BigDecimal sum = BigDecimal.ZERO;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                double value = Math.round((crypto.getQuantity()*crypto.buyCrypto(crypto.getCryptoName())) * 100.0) / 100.0;
-                sum += value;
+                BigDecimal value = (crypto.getQuantity()).multiply(crypto.buyCrypto(crypto.getCryptoName()));
+                sum =sum.add(value);
                 System.out.println(crypto.getCryptoName()+": $" + value);
             }
         }
-        sum = Math.round(sum * 100.0) / 100.0;
+        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
         System.out.println("Total value = $" + sum);
     }
 
 
-    public double getValueCrypto() throws IOException, InterruptedException {
-        double sum = 0;
+    public BigDecimal getValueCrypto() throws IOException, InterruptedException {
+        BigDecimal sum = BigDecimal.ZERO;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                double value = Math.round((crypto.getQuantity()*crypto.buyCrypto(crypto.getCryptoName())) * 100.0) / 100.0;
-                sum += value;
+                BigDecimal value = (crypto.getQuantity()).multiply(crypto.buyCrypto(crypto.getCryptoName()));
+                sum =sum.add(value);
             }
         }
-        sum = Math.round(sum * 100.0) / 100.0;
+        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
         return sum;
     }
 
-    public void sellCrypto(String name, double quantity) throws IOException, InterruptedException {
+    public void sellCrypto(String name, BigDecimal quantity) throws IOException, InterruptedException {
         if (portfolio.containsKey(name)) {
             Crypto crypto = (Crypto) portfolio.get(name);
-            if (crypto.getQuantity() < quantity) {
+
+            if ((crypto.getQuantity().compareTo(quantity) < 0)) {
                 System.out.println("You do not have enough crypto to sell that amount.");
             } else {
                 System.out.println("Transaction Successful");
-                double price = crypto.sellCrypto(name, quantity);
+                BigDecimal price = crypto.sellCrypto(name, quantity);
                 this.cash.deposit(price);
-                if (crypto.getQuantity() == 0) {
+                if (crypto.getQuantity().setScale(0, RoundingMode.HALF_EVEN).equals(BigDecimal.ZERO)) {
                     portfolio.remove(name);
                     System.out.println("No longer have any " + name + " crypto.");
                 }
@@ -336,59 +343,58 @@ public class Account implements Serializable {
 
     public void valuePortfolio() throws IOException, InterruptedException {
         headerAccount();
-        double sumStock = 0;
+        BigDecimal sumStock = BigDecimal.valueOf(0);
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Stock stock) {
-                double value = Math.round((stock.getQuantity() * stock.buyStock(stock.getStockName())) * 100.0) / 100.0;
-                sumStock += value;
+                BigDecimal value = (stock.getQuantity()).multiply(stock.buyStock(stock.getStockName()));
+                sumStock = sumStock.add(value);
                 System.out.println(stock.getStockName()+": $" + value);
             }
         }
-        if(sumStock == 0){
+        if(sumStock == BigDecimal.ZERO){
             System.out.println("No current stocks on profile.");
         }
-        sumStock = Math.round(sumStock * 100.0) / 100.0;
+        sumStock = sumStock.setScale(2, RoundingMode.HALF_EVEN);
         System.out.println("Total Stock Value = $" + sumStock);
 
         System.out.println("________________________________________________________");
 
 
         System.out.print("Current Bond Holdings: \n\n");
-        double sumBond = 0;
+        BigDecimal sumBond = BigDecimal.valueOf(0);
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Bonds bond) {
-                sumBond += bond.getPresentValue();
+                sumBond =sumBond.add(bond.getPresentValue());
                 System.out.println(bond.getBondSymbol()+": $" + bond.getPresentValue() );
             }
         }
-        if(sumBond == 0){
+        if(sumBond == BigDecimal.ZERO){
             System.out.println("No current bonds on profile.");
         }
-        sumBond = Math.round(sumBond * 100.0) / 100.0;
+        sumBond = sumBond.setScale(2, RoundingMode.HALF_EVEN);
         System.out.println("Total Bond Value = $" + sumBond);
         System.out.println("________________________________________________________");
 
 
         System.out.print("Current Crypto Holdings: \n\n");
-        double sumCrypto = 0;
+        BigDecimal sumCrypto = BigDecimal.ZERO;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
             if (entry.getValue() instanceof Crypto crypto) {
-                double value = Math.round((crypto.getQuantity()*crypto.buyCrypto(crypto.getCryptoName())) * 100.0) / 100.0;
-                sumCrypto += value;
+                BigDecimal value = (crypto.getQuantity()).multiply(crypto.buyCrypto(crypto.getCryptoName()));                sumCrypto = sumCrypto.add(value);
                 System.out.println(crypto.getCryptoName()+": $" + value);
             }
         }
 
-        if(sumCrypto == 0){
+        if(sumCrypto == BigDecimal.ZERO){
             System.out.println("No current cryptos on profile.");
         }
 
-        sumCrypto = Math.round(sumCrypto * 100.0) / 100.0;
+        sumCrypto = sumCrypto.setScale(2, RoundingMode.HALF_EVEN);
         System.out.println("Total value = $" + sumCrypto);
         System.out.println("________________________________________________________");
 
-        double total = sumStock + sumBond + sumCrypto;
-        System.out.println("Total Portfolio Value = $" + (Math.round(total * 100.0) / 100.0));
+        BigDecimal total = sumStock.add(sumBond.add(sumCrypto));
+        System.out.println("Total Portfolio Value = $" + total.setScale(2, RoundingMode.HALF_EVEN));
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
     }
 
@@ -405,9 +411,9 @@ public class Account implements Serializable {
         chart.getStyler().setPlotContentSize(.7);
         chart.getStyler().setStartAngleInDegrees(90);
 
-        double r = getValueStocks();
-        double g = getValueBonds();
-        double b = getValueCrypto();
+        BigDecimal r = getValueStocks();
+        BigDecimal g = getValueBonds();
+        BigDecimal b = getValueCrypto();
         chart.addSeries("Stocks", r);
         chart.addSeries("Bonds", g);
         chart.addSeries("Crypto", b);

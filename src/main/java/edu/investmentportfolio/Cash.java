@@ -2,37 +2,39 @@ package edu.investmentportfolio;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Cash implements Serializable, Instrument {
     @Serial
     private static final long serialVersionUID = 4L;
-    private double balance;
-    private final double interest;
+    private BigDecimal balance;
+    private final BigDecimal interest;
 
     public Cash() {
-        this.balance = 0.00;
-        this.interest = 0.25;
+        this.balance = BigDecimal.valueOf(0.00);
+        this.interest = BigDecimal.valueOf(0.25);
     }
 
-    public void withdraw(double cashAmount) {
-        if (cashAmount < this.balance) {
+    public void withdraw(BigDecimal cashAmount) {
+        if (cashAmount.compareTo(this.balance) < 0) {
             this.balance = setMoney(this.balance);
             cashAmount = setMoney(cashAmount);
-            this.balance -= cashAmount;
+            this.balance = this.balance.subtract(cashAmount);
         }
     }
 
-    public void deposit(double cashAmount) {
-        this.balance = this.balance + cashAmount;
+    public void deposit(BigDecimal cashAmount) {
+        this.balance = this.balance.add(cashAmount);
         setMoney(this.balance);
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return setMoney(this.balance);
     }
 
     public void addInterest() {
-        this.balance = this.balance * this.interest + this.balance;
+        this.balance = (this.balance.multiply(this.interest)).add(this.balance);
         setMoney(this.balance);
     }
 
@@ -42,7 +44,7 @@ public class Cash implements Serializable, Instrument {
         return "Cash Balance: " + setMoney(this.balance) + ", Interest Rate: " + this.interest + "\n";
     }
 
-    public double setMoney(double cashBalance) {
-        return Math.round(cashBalance * 100.0) / 100.0;
+    public BigDecimal setMoney(BigDecimal cashBalance) {
+        return cashBalance.setScale(2, RoundingMode.HALF_EVEN);
     }
 }
