@@ -49,7 +49,7 @@ public class Crypto implements Serializable, Instrument{
         if (cryptoPrice == BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN)) {
             System.out.print("Invalid crypto name.\n");
         } else {
-            cryptoPrice = setPriceCrypto(cryptoPrice);
+            //cryptoPrice = setPriceCrypto(cryptoPrice);
             System.out.print("Crypto Name: " + name + ", Price: " + cryptoPrice + "\n");
         }
     }
@@ -59,7 +59,6 @@ public class Crypto implements Serializable, Instrument{
         BigDecimal cryptoPrice = getCryptoPrice(name);
         if ((cryptoQuantity).compareTo(this.quantity) <= 0) {
             this.quantity = this.quantity.subtract(cryptoQuantity);
-            cryptoPrice = cryptoPrice.setScale(2, RoundingMode.HALF_EVEN);
             return setPriceCrypto(cryptoPrice.multiply(cryptoQuantity));
         }
         return BigDecimal.ZERO;

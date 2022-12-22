@@ -50,7 +50,6 @@ public class Bonds implements Serializable, Instrument {
 
         if (bondQuantity.compareTo(this.quantity) <= 0) {
             this.quantity = this.quantity.subtract(bondQuantity);
-            sellPrice = setValue(sellPrice);
             return sellPrice.multiply(bondQuantity);
         }
         return BigDecimal.ZERO;
@@ -83,6 +82,7 @@ public class Bonds implements Serializable, Instrument {
         // (ex. YTM for a 7-year bond is 3.69 from https://ycharts.com/indicators/7_year_treasury_rate )
         BigDecimal newCouponRate = couponRate.divide(BigDecimal.valueOf(100));
 
+        //If I do not round valueFromInterest and valueFromRedemption I get an ArithmeticException: "Non-terminating decimal expansion; no exact representable decimal result"
 
         BigDecimal base =(BigDecimal.ONE.add(ytm.divide(n)) );
         BigDecimal exp = ((n.negate()).multiply(BigDecimal.valueOf(t)));

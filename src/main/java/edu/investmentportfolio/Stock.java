@@ -57,7 +57,6 @@ public class Stock implements Serializable, Instrument {
 
         if ((stockQuantity.compareTo(this.quantity) <= 0)) {
             this.quantity = this.quantity.subtract(stockQuantity);
-            stockPrice = stockPrice.setScale(2, RoundingMode.HALF_EVEN);
             return stockPrice.multiply(stockQuantity);
         }
         return BigDecimal.ZERO;

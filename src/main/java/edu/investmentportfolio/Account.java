@@ -54,7 +54,7 @@ public class Account implements Serializable {
         BigDecimal amount = price.multiply(quantity);
 
         // if price is zero, then there is no stock with that name.
-        if (!(price.equals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN)))) {
+        if (!(price.equals(setScaleOf(BigDecimal.ZERO) ))) {
             if ((this.cash.getBalance()).compareTo(amount) < 0) {
                 System.out.println("You do not have enough money to buy that stock.");
             } else {
@@ -90,7 +90,7 @@ public class Account implements Serializable {
                 System.out.println(stock.getStockName() + ": $" + value);
             }
         }
-        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
+        sum = setScaleOf(sum);
         System.out.println("Total value = $" + sum);
     }
 
@@ -102,7 +102,7 @@ public class Account implements Serializable {
                 sum = sum.add(value);
             }
         }
-        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
+        sum = setScaleOf(sum);
         return sum;
     }
 
@@ -184,7 +184,7 @@ public class Account implements Serializable {
                 System.out.println(bond.getBondSymbol()+": $" + bond.getPresentValue());
             }
         }
-        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
+        sum = setScaleOf(sum);
         System.out.println("Total present value = $" + sum);
     }
 
@@ -196,7 +196,7 @@ public class Account implements Serializable {
                 sum =sum.add(bond.getPresentValue());
             }
         }
-        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
+        sum = setScaleOf(sum);
         return sum;
     }
 
@@ -227,7 +227,7 @@ public class Account implements Serializable {
         BigDecimal price = desiredCrypto.buyCrypto(name);
         BigDecimal amount = price.multiply(quantity);
 
-        if (!(price.equals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN)))) {
+        if (!(price.equals(setScaleOf(BigDecimal.ZERO)))) {
 
             if ((this.cash.getBalance().compareTo(amount) < 0)) {
                 System.out.println("You do not have enough money to buy that Crypto.");
@@ -263,7 +263,7 @@ public class Account implements Serializable {
                 System.out.println(crypto.getCryptoName()+": $" + value);
             }
         }
-        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
+        sum = setScaleOf(sum);
         System.out.println("Total value = $" + sum);
     }
 
@@ -276,7 +276,7 @@ public class Account implements Serializable {
                 sum =sum.add(value);
             }
         }
-        sum = sum.setScale(2, RoundingMode.HALF_EVEN);
+        sum = setScaleOf(sum);
         return sum;
     }
 
@@ -354,7 +354,7 @@ public class Account implements Serializable {
         if(sumStock == BigDecimal.ZERO){
             System.out.println("No current stocks on profile.");
         }
-        sumStock = sumStock.setScale(2, RoundingMode.HALF_EVEN);
+        sumStock = setScaleOf(sumStock);
         System.out.println("Total Stock Value = $" + sumStock);
 
         System.out.println("________________________________________________________");
@@ -371,7 +371,7 @@ public class Account implements Serializable {
         if(sumBond == BigDecimal.ZERO){
             System.out.println("No current bonds on profile.");
         }
-        sumBond = sumBond.setScale(2, RoundingMode.HALF_EVEN);
+        sumBond = setScaleOf(sumBond);
         System.out.println("Total Bond Value = $" + sumBond);
         System.out.println("________________________________________________________");
 
@@ -389,12 +389,12 @@ public class Account implements Serializable {
             System.out.println("No current cryptos on profile.");
         }
 
-        sumCrypto = sumCrypto.setScale(2, RoundingMode.HALF_EVEN);
+        sumCrypto = setScaleOf(sumCrypto);
         System.out.println("Total value = $" + sumCrypto);
         System.out.println("________________________________________________________");
 
         BigDecimal total = sumStock.add(sumBond.add(sumCrypto));
-        System.out.println("Total Portfolio Value = $" + total.setScale(2, RoundingMode.HALF_EVEN));
+        System.out.println("Total Portfolio Value = $" + setScaleOf(total));
         System.out.println("_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _");
     }
 
@@ -422,5 +422,9 @@ public class Account implements Serializable {
 
         //Uncomment the following line if you want to save the graph:
         //BitmapEncoder.saveBitmapWithDPI(chart, "./FinancialInstrumentsGraph", BitmapEncoder.BitmapFormat.PNG, 300)
+    }
+
+    public BigDecimal setScaleOf (BigDecimal value) {
+        return (value.setScale(2, RoundingMode.HALF_EVEN));
     }
 }
