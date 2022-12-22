@@ -86,10 +86,8 @@ public class Bonds implements Serializable, Instrument {
     }
 
     public static int setYear(int name){
-        if ((name == 30 || name == 20 ||
-                name == 10|| name == 7||
-                name == 5|| name == 3||
-                name == 2)){
+        if ((name == 30 || name == 20 || name == 10||
+                name == 7|| name == 5|| name == 3|| name == 2)){
             return name;
         }
         else{

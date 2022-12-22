@@ -9,7 +9,6 @@ import java.util.Scanner;
  */
 public class App {
 
-    //This will be the only scanner:
     static Scanner scanner = new Scanner(System.in);
 
     public static void save(Account user) throws IOException{
@@ -257,7 +256,8 @@ public class App {
                     System.out.println("_________________");
 
                     System.out.print("Please enter bond year: ");
-                    String bondName = scanner.nextLine();
+                    int bondName = scanner.nextInt();
+                    scanner.nextLine();
 
                     System.out.print("Please enter quantity: ");
                     double bondQuantity = Double.parseDouble(scanner.nextLine());

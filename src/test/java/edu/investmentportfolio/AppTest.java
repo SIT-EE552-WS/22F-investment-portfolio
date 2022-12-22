@@ -48,7 +48,7 @@ public class AppTest {
         Assertions.assertEquals(0.0,account.getValueBonds()); // Buying 0 bonds should return 0
         account.addBond(10,1000,1);
         Assertions.assertEquals(1029.35,account.getValueBonds()); // Value of bonds is based on a constant equation and returns a specific value
-        account.sellBond("10",1);
+        account.sellBond(10,1);
         Assertions.assertEquals(0.0,account.getValueBonds()); // Selling the bond should return 0
 
     }

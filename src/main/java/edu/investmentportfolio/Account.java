@@ -10,6 +10,7 @@ import org.knowm.xchart.*;
 import org.knowm.xchart.style.PieStyler;
 import org.knowm.xchart.style.Styler;
 
+import javax.swing.*;
 
 
 @SuppressWarnings("DuplicatedCode")
@@ -146,13 +147,11 @@ public class Account implements Serializable {
                     System.out.println("You do not have enough money to buy that bond.");
                 } else {
                     this.cash.withdraw(amount);
-                    //now here
                     String finalName = name +"year";
                     if (portfolio.containsKey(finalName)) {
                         Bonds bond = (Bonds) portfolio.get(finalName);
                         bond.addQuantity(quantity);
                     } else {
-                        // was here
                         Bonds bond = new Bonds(finalName, faceValue, quantity, couRate, yieldVal, expMonth, expYear);
                         portfolio.put(finalName, bond);
                     }
@@ -185,7 +184,7 @@ public class Account implements Serializable {
         System.out.println("Total present value = $" + sum);
     }
 
-    // This function calculates the value of all bonds and returns the final sum without printing everything out
+    // This function calculates the value of all bonds and returns the final sum without printing the value of each bond or the final sum
     public double getValueBonds() {
         double sum = 0;
         for (Map.Entry<String, Instrument> entry : portfolio.entrySet()) {
@@ -197,10 +196,10 @@ public class Account implements Serializable {
         return sum;
     }
 
-    public void sellBond(String name, double quantity) {
-        name = name + "year";
-        if (portfolio.containsKey(name)) {
-            Bonds bond = (Bonds) portfolio.get(name);
+    public void sellBond(int name, double quantity) {
+        String nameString =  name + "year";
+        if (portfolio.containsKey(nameString)) {
+            Bonds bond = (Bonds) portfolio.get(nameString);
             if (bond.getQuantity() < quantity) {
                 System.out.println("You do not have enough bonds to sell that amount.");
             } else {
@@ -208,8 +207,8 @@ public class Account implements Serializable {
                 double price = bond.sellBonds(quantity);
                 this.cash.deposit(price);
                 if (bond.getQuantity() == 0) {
-                    portfolio.remove(name);
-                    System.out.println("No longer have a " + name + " bond.");
+                    portfolio.remove(nameString);
+                    System.out.println("No longer have a " + nameString + " bond.");
                 }
             }
         } else {
@@ -413,7 +412,7 @@ public class Account implements Serializable {
         chart.addSeries("Bonds", g);
         chart.addSeries("Crypto", b);
 
-        new SwingWrapper<>(chart).displayChart();
+        new SwingWrapper<>(chart).displayChart().setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);;
 
         //Uncomment the following line if you want to save the graph:
         //BitmapEncoder.saveBitmapWithDPI(chart, "./FinancialInstrumentsGraph", BitmapEncoder.BitmapFormat.PNG, 300)

@@ -35,6 +35,9 @@ public class Crypto implements Serializable, Instrument{
     //method to buy crypto
     public double buyCrypto(String name) throws IOException, InterruptedException {
         double cryptoPrice = getCryptoPrice(name);
+        if (cryptoPrice == 0) {
+            System.out.print("Invalid crypto name.\n");
+        }
         return setPriceCrypto(cryptoPrice);
     }
 

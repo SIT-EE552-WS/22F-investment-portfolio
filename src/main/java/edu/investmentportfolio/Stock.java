@@ -12,10 +12,10 @@ public class Stock implements Serializable, Instrument {
     private double price;
     private double quantity;
     static StockMarket stockMarket = new StockMarket();
-    public Stock() throws IOException {
+    public Stock(){
     }
 
-    public Stock(String stockName, double price, double quantity) throws IOException {
+    public Stock(String stockName, double price, double quantity){
         this.stockName = stockName;
         this.price = price;
         this.quantity = quantity;
@@ -31,6 +31,9 @@ public class Stock implements Serializable, Instrument {
     // method to buy a stock
     public double buyStock(String name) throws IOException, InterruptedException {
         double stockPrice = getStockPrice(name);
+        if (stockPrice == 0) {
+            System.out.print("Invalid stock name.\n");
+        }
         return setPriceStock(stockPrice);
     }
 
